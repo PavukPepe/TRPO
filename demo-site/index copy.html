@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - ZXC</title>
+  <style>
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    body.light {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    body.dark {
+      background-color: #0a0a0a;
+      color: #ededed;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero .subheading {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .btn, .btn-primary {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #2563eb;
+    }
+
+    .card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .gallery img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .image-block img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .text-block {
+      margin: 1rem 0;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .gallery {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 {
+        font-size: 1.5rem;
+      }
+
+      .gallery {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  
+  </style>
+</head>
+<body class="dark">
+  <div class="container">
+    <header style="background-color: var(--card);
+    color: var(--foreground);
+    padding: 16px;
+    text-align: left;
+    font-size: 16px;">
+  <nav>
+    <h1>Заголовок сайта</h1>
+  </nav>
+</header>
+<header style="background-color: var(--card);
+    color: var(--foreground);
+    padding: 16px;
+    text-align: left;
+    font-size: 16px;">
+  <nav>
+    <h1>Заголовок сайта</h1>
+  </nav>
+</header>
+<section class="hero" style="background-color: transparent;
+    color: inherit;
+    padding: 16px;
+    text-align: left;
+    font-size: 16px;">
+  <h1>Добро пожаловать</h1>
+  
+  
+</section>
+<div style="background-color: transparent;
+    color: inherit;
+    padding: 16px;
+    text-align: left;
+    font-size: 16px;">
+  <p>Компонент: features</p>
+</div>
+<div style="background-color: transparent;
+    color: inherit;
+    padding: 16px;
+    text-align: left;
+    font-size: 16px;">
+  <p>Компонент: cta</p>
+</div>
+<footer style="background-color: var(--card);
+    color: var(--muted-foreground);
+    padding: 16px;
+    text-align: center;
+    font-size: 16px;">
+  <p>© 2026 Ваша Компания. Все права защищены.</p>
+</footer>
+<footer style="background-color: transparent;
+    color: inherit;
+    padding: 16px;
+    text-align: left;
+    font-size: 16px;">
+  <p>© 2026 Все права защищены</p>
+</footer>
+<div class="text-block" style="background-color: transparent;
+    color: var(--foreground);
+    padding: 24px;
+    text-align: left;
+    font-size: 16px;">
+  <p>Наша компания предоставляет высококачественные услуги и решения для вашего бизнеса. Мы работаем с клиентами по всему миру и гарантируем индивидуальный подход к каждому проекту.</p>
+</div>
+<div style="background-color: var(--background);
+    color: var(--foreground);
+    padding: 16px;
+    text-align: left;
+    font-size: 16px;">
+  <p>Компонент: audio</p>
+</div>
+<div style="background-color: var(--card);
+    color: var(--foreground);
+    padding: 32px;
+    text-align: center;
+    font-size: 16px;">
+  <p>Компонент: testimonial</p>
+</div>
+<div style="background-color: var(--primary);
+    color: var(--primary-foreground);
+    padding: 48px;
+    text-align: center;
+    font-size: 16px;">
+  <p>Компонент: cta</p>
+</div>
+<div style="background-color: transparent;
+    color: inherit;
+    padding: 16px;
+    text-align: left;
+    font-size: 16px;">
+  <p>Компонент: pricing</p>
+</div>
+<div style="background-color: transparent;
+    color: inherit;
+    padding: 0px;
+    text-align: left;
+    font-size: 16px;">
+  <p>Компонент: map</p>
+</div>
+<div style="background-color: transparent;
+    color: inherit;
+    padding: 16px;
+    text-align: left;
+    font-size: 16px;">
+  <p>Компонент: table</p>
+</div>
+<div style="background-color: transparent;
+    color: inherit;
+    padding: 16px;
+    text-align: left;
+    font-size: 16px;">
+  <p>Компонент: progress</p>
+</div>
+<div style="background-color: transparent;
+    color: inherit;
+    padding: 16px;
+    text-align: left;
+    font-size: 16px;">
+  <p>Компонент: countdown</p>
+</div>
+<div style="background-color: var(--background);
+    color: var(--foreground);
+    padding: 24px;
+    text-align: left;
+    font-size: 16px;">
+  <p>Компонент: accordion</p>
+</div>
+<div style="background-color: var(--primary);
+    color: var(--primary-foreground);
+    padding: 48px;
+    text-align: center;
+    font-size: 16px;">
+  <p>Компонент: cta</p>
+</div>
+<div style="background-color: var(--primary);
+    color: var(--primary-foreground);
+    padding: 48px;
+    text-align: center;
+    font-size: 16px;">
+  <p>Компонент: cta</p>
+</div>
+<div style="background-color: var(--muted);
+    color: var(--foreground);
+    padding: 48px;
+    text-align: left;
+    font-size: 16px;">
+  <p>Компонент: features</p>
+</div>
+<div style="background-color: var(--primary);
+    color: var(--primary-foreground);
+    padding: 48px;
+    text-align: center;
+    font-size: 16px;">
+  <p>Компонент: cta</p>
+</div>
+<section class="hero" style="background-color: var(--primary);
+    color: var(--primary-foreground);
+    padding: 48px;
+    text-align: center;
+    font-size: 16px;">
+  <h1>Создайте идеальный сайт без единой строчки кода</h1>
+  <p class="subheading">Профессиональные сайты за минуты. Просто перетаскивайте элементы и настраивайте под себя</p>
+  <button class="btn-primary">Начать бесплатно</button>
+</section>
+  </div>
+  
+  <script>
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Simple form handling
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Форма отправлена! (В реальном приложении здесь будет отправка на сервер)');
+      });
+    });
+  </script>
+  
+</body>
+</html>

@@ -1,0 +1,2032 @@
+%% Level 1: основные модели БД (только имена)
+classDiagram
+direction LR
+class AuditLog
+class Brand
+class BrandSalesAnalyticsView
+class DeliveredOrder
+class Material
+class Order
+class OrderDetail
+class OrderStatus
+class PasswordResetToken
+class PaymentStatus
+class PendingRegistration
+class Product
+class ProductInventoryView
+class Role
+class TelegramVerificationToken
+class User
+class UserOrdersSummaryView
+class UserPreference
+
+%% Level 2: перечень моделей и API-классов (без полей и методов)
+classDiagram
+direction LR
+%% Доменные модели
+class AuditLog
+class Brand
+class BrandSalesAnalyticsView
+class DeliveredOrder
+class Material
+class Order
+class OrderDetail
+class OrderStatus
+class PasswordResetToken
+class PaymentStatus
+class PendingRegistration
+class Product
+class ProductInventoryView
+class Role
+class TelegramVerificationToken
+class User
+class UserOrdersSummaryView
+class UserPreference
+
+%% Инфраструктура и сервисы
+class AppDbContext
+class Program
+class ExceptionMiddleware
+class ShopMetrics
+class ShopMetricsCollector
+class IDatabaseDumpService
+class DatabaseDumpService
+class DatabaseDumpOptions
+class ITelegramMessenger
+class TelegramMessenger
+class TelegramOptions
+class RegistrationOptions
+
+%% Контроллеры
+class AnalyticsController
+class BrandController
+class DatabaseController
+class DeliveredOrderController
+class MaterialController
+class OrderController
+class OrderDetailController
+class OrderStatusController
+class PaymentStatusController
+class ProductController
+class RegistrationController
+class RoleController
+class TelegramVerificationController
+class UserController
+class UserPreferencesController
+class PasswordResetController
+
+%% DTOs
+class AnalyticsDashboardDto
+class AnalyticsRecentOrderDto
+class AnalyticsLowStockProductDto
+class SalesByBrandDto
+class RevenueTrendPointDto
+class BrandRevenueDto
+class BrandDto
+class BrandCreateDto
+class MaterialDto
+class MaterialCreateDto
+class ProductListItemDto
+class ProductBrandDto
+class ProductUpdateDto
+class ProductCreateDto
+class OrderDto
+class OrderCreateDto
+class OrderStatusUpdateDto
+class OrderSummaryDto
+class OrderItemDto
+class OrderDetailsDto
+class DeliveredOrderSummaryDto
+class DeliveredOrderDto
+class CheckoutItemDto
+class CreateOrderRequestDto
+class CheckoutResultDto
+class UserDto
+class UserCreateDto
+class UserUpdateDto
+class RoleDto
+class RegistrationRequestDto
+class RegistrationRequestResponseDto
+class RegistrationConfirmDto
+class RegistrationBotStartDto
+class RegistrationResendDto
+class TelegramVerificationRequestDto
+class TelegramVerificationByLoginRequestDto
+class TelegramVerificationConfirmDto
+class UserPreferenceDto
+class PasswordResetRequestDto
+class PasswordResetCompleteDto
+
+%% Level 3: поля (без методов, без связей)
+classDiagram
+direction TB
+
+%% Доменные модели
+class AuditLog {
+  +Id : long
+  +UserId : long
+  +OperationTime : DateTime
+  +TableName : string
+  +OldData : string
+  +NewData : string
+}
+class Brand {
+  +Id : long
+  +Name : string
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+}
+class BrandSalesAnalyticsView {
+  +BrandId : long
+  +BrandName : string
+  +TotalOrders : int
+  +DeliveredOrders : int
+  +TotalUnits : int
+  +TotalRevenue : decimal
+  +AvgOrderValue : decimal
+}
+class DeliveredOrder {
+  +OrderId : long
+  +DeliveryDate : DateTime
+  +CourierName : string
+}
+class Material {
+  +Id : long
+  +Name : string
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+  +UpdatedAt : DateTime
+}
+class Order {
+  +Id : long
+  +UserId : long
+  +OrderStatusId : long
+  +PaymentStatusId : long
+  +OrderDate : DateTime
+  +TotalAmount : decimal
+  +DeliveryAddress : string?
+  +PaymentMethod : string?
+  +IsDeleted : bool
+}
+class OrderDetail {
+  +OrderId : long
+  +ProductId : long
+  +Quantity : int
+  +PriceAtMoment : decimal
+}
+class OrderStatus {
+  +Id : long
+  +Name : string
+  +CreatedAt : DateTime
+}
+class PasswordResetToken {
+  +Id : long
+  +UserId : long
+  +Token : Guid
+  +ExpiresAt : DateTime
+  +ConsumedAt : DateTime?
+  +IsRevoked : bool
+  +CreatedAt : DateTime
+}
+class PaymentStatus {
+  +Id : long
+  +Name : string
+  +CreatedAt : DateTime
+}
+class PendingRegistration {
+  +Id : Guid
+  +Login : string
+  +PasswordHash : string
+  +FullName : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +VerificationCode : string
+  +CreatedAt : DateTime
+  +ExpiresAt : DateTime
+  +ConsumedAt : DateTime?
+  +RoleId : long
+}
+class Product {
+  +Id : long
+  +Name : string
+  +Description : string?
+  +BrandId : long
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+  +UpdatedAt : DateTime
+}
+class ProductInventoryView {
+  +Id : long
+  +Name : string
+  +Description : string?
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+  +BrandName : string
+  +Materials : List<string>
+}
+class Role {
+  +Id : long
+  +Name : string
+  +CreatedAt : DateTime
+}
+class TelegramVerificationToken {
+  +Id : long
+  +UserId : long
+  +Code : string
+  +ExpiresAt : DateTime
+  +ConfirmedAt : DateTime?
+  +CreatedAt : DateTime
+}
+class User {
+  +Id : long
+  +Login : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +TelegramVerified : bool
+  +Password : string
+  +RoleId : long
+  +FullName : string?
+  +CreationDatetime : DateTime
+  +UpdateDatetime : DateTime?
+  +LastLoginAt : DateTime?
+  +IsArchived : bool
+  +IsDeleted : bool
+}
+class UserOrdersSummaryView {
+  +UserId : long
+  +Login : string
+  +TelegramUsername : string
+  +TotalOrders : int
+  +TotalSpent : decimal
+  +LastOrderAt : DateTime?
+}
+class UserPreference {
+  +UserId : long
+  +Theme : string
+  +UpdatedAt : DateTime
+}
+
+%% Контекст и инфраструктура
+class AppDbContext {
+  +AuditLogs : DbSet<AuditLog>
+  +Brands : DbSet<Brand>
+  +DeliveredOrders : DbSet<DeliveredOrder>
+  +Materials : DbSet<Material>
+  +Orders : DbSet<Order>
+  +OrderDetails : DbSet<OrderDetail>
+  +OrderStatuses : DbSet<OrderStatus>
+  +PaymentStatuses : DbSet<PaymentStatus>
+  +Products : DbSet<Product>
+  +Roles : DbSet<Role>
+  +Users : DbSet<User>
+  +ProductInventoryView : DbSet<ProductInventoryView>
+  +UserOrdersSummaryView : DbSet<UserOrdersSummaryView>
+  +BrandSalesAnalyticsView : DbSet<BrandSalesAnalyticsView>
+  +UserPreferences : DbSet<UserPreference>
+  +PasswordResetTokens : DbSet<PasswordResetToken>
+  +TelegramVerificationTokens : DbSet<TelegramVerificationToken>
+  +PendingRegistrations : DbSet<PendingRegistration>
+}
+class Program {
+  +builder : WebApplicationBuilder
+  +app : WebApplication
+}
+class ExceptionMiddleware {
+  -next : RequestDelegate
+  -logger : ILogger
+}
+class ShopMetrics {
+  <<static>>
+  +ActiveUsers : Gauge
+  +OrdersTotal : Gauge
+  +OrdersByStatus : Gauge
+  +ProductsInStock : Gauge
+}
+class ShopMetricsCollector {
+  -_scopeFactory : IServiceScopeFactory
+  -_logger : ILogger
+  -_interval : TimeSpan
+}
+class IDatabaseDumpService {
+  <<interface>>
+}
+class DatabaseDumpOptions {
+  +PgDumpPath : string
+  +PsqlPath : string
+}
+class DatabaseDumpService {
+  -_contextFactory : IDbContextFactory<AppDbContext>
+  -_logger : ILogger
+  -_pgDumpPath : string
+  -_psqlPath : string
+}
+class ITelegramMessenger {
+  <<interface>>
+}
+class TelegramOptions {
+  +BotToken : string
+  +VerificationTemplate : string
+  +PasswordResetTemplate : string
+}
+class TelegramMessenger {
+  -_httpClient : HttpClient
+  -_options : TelegramOptions
+}
+class RegistrationOptions {
+  +BotSecret : string
+  +DefaultRoleName : string
+  +VerificationCodeTtlMinutes : int
+}
+
+%% Контроллеры (только поля)
+class AnalyticsController {
+  -context : AppDbContext
+}
+class BrandController {
+  -context : AppDbContext
+}
+class DatabaseController {
+  -dumpService : IDatabaseDumpService
+  -logger : ILogger
+}
+class DeliveredOrderController {
+  -context : AppDbContext
+}
+class MaterialController {
+  -context : AppDbContext
+}
+class OrderController {
+  -context : AppDbContext
+}
+class OrderDetailController {
+  -context : AppDbContext
+}
+class OrderStatusController {
+  -context : AppDbContext
+}
+class PaymentStatusController {
+  -context : AppDbContext
+}
+class ProductController {
+  -context : AppDbContext
+}
+class RegistrationController {
+  -context : AppDbContext
+  -messenger : ITelegramMessenger
+  -options : RegistrationOptions
+  -logger : ILogger
+}
+class RoleController {
+  -context : AppDbContext
+}
+class TelegramVerificationController {
+  -context : AppDbContext
+  -messenger : ITelegramMessenger
+  -logger : ILogger
+}
+class UserController {
+  -context : AppDbContext
+  -logger : ILogger
+}
+class UserPreferencesController {
+  -context : AppDbContext
+}
+class PasswordResetController {
+  -context : AppDbContext
+  -messenger : ITelegramMessenger
+  -logger : ILogger
+}
+
+%% DTO (только поля)
+class AnalyticsDashboardDto {
+  +TotalProducts : int
+  +TotalOrders : int
+  +TotalUsers : int
+  +TotalRevenue : decimal
+  +RecentOrders : IEnumerable<AnalyticsRecentOrderDto>
+  +LowStockProducts : IEnumerable<AnalyticsLowStockProductDto>
+  +TopCustomers : IEnumerable<UserOrdersSummaryView>
+  +SalesByBrand : IEnumerable<SalesByBrandDto>
+  +RevenueTrend : IEnumerable<RevenueTrendPointDto>
+}
+class AnalyticsRecentOrderDto {
+  +Id : long
+  +Customer : string
+  +OrderStatus : string
+  +PaymentStatus : string
+  +OrderDate : DateTime
+}
+class AnalyticsLowStockProductDto {
+  +Id : long
+  +Name : string
+  +Brand : string
+  +StockQuantity : int
+}
+class SalesByBrandDto {
+  +BrandId : long
+  +Brand : string
+  +Orders : int
+  +DeliveredOrders : int
+  +Units : int
+  +Revenue : decimal
+  +AverageOrderValue : decimal
+}
+class RevenueTrendPointDto {
+  +Date : DateTime
+  +Revenue : decimal
+  +Orders : int
+}
+class BrandRevenueDto {
+  +BrandId : long
+  +BrandName : string
+  +Revenue : decimal
+  +DateFrom : DateTime
+  +DateTo : DateTime
+}
+class BrandDto {
+  +Id : long
+  +Name : string
+}
+class BrandCreateDto {
+  +Name : string
+}
+class MaterialDto {
+  +Id : long
+  +Name : string
+}
+class MaterialCreateDto {
+  +Name : string
+}
+class ProductListItemDto {
+  +Id : long
+  +Name : string
+  +Description : string?
+  +BrandId : long
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+  +UpdatedAt : DateTime
+  +Brand : ProductBrandDto
+}
+class ProductBrandDto {
+  +Id : long
+  +Name : string
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+}
+class ProductUpdateDto {
+  +Id : long
+  +Name : string
+  +Description : string?
+  +BrandId : long
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+}
+class ProductCreateDto {
+  +Name : string
+  +Description : string?
+  +BrandId : long
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+}
+class OrderDto {
+  +Id : long
+  +UserId : long
+  +OrderStatusId : long
+  +PaymentStatusId : long
+  +OrderDate : DateTime
+}
+class OrderCreateDto {
+  +UserId : long
+  +OrderStatusId : long
+  +PaymentStatusId : long
+}
+class OrderStatusUpdateDto {
+  +Id : long
+  +OrderStatusId : long
+  +PaymentStatusId : long
+  +DeliveryDate : DateTime?
+  +CourierName : string?
+}
+class OrderSummaryDto {
+  +Id : long
+  +UserId : long
+  +OrderDate : DateTime
+  +TotalAmount : decimal
+  +OrderStatusId : long
+  +OrderStatus : string
+  +PaymentStatusId : long
+  +PaymentStatus : string
+  +CustomerLogin : string?
+  +CustomerTelegram : string?
+  +CustomerName : string?
+  +DeliveredOrder : DeliveredOrderSummaryDto?
+}
+class OrderItemDto {
+  +ProductId : long
+  +ProductName : string
+  +Quantity : int
+  +PriceAtMoment : decimal
+}
+class OrderDetailsDto {
+  +Items : List<OrderItemDto>
+}
+class DeliveredOrderSummaryDto {
+  +OrderId : long
+  +DeliveryDate : DateTime
+  +CourierName : string
+}
+class DeliveredOrderDto {
+  +OrderId : long
+  +DeliveryDate : DateTime
+  +CourierName : string
+}
+class CheckoutItemDto {
+  +ProductId : long
+  +Quantity : int
+}
+class CreateOrderRequestDto {
+  +UserId : long
+  +Items : List<CheckoutItemDto>
+  +PaymentStatusId : long?
+  +OrderStatusId : long?
+}
+class CheckoutResultDto {
+  +OrderId : long
+  +TotalAmount : decimal
+}
+class UserDto {
+  +Id : long
+  +Login : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +TelegramVerified : bool
+  +RoleId : long
+  +FullName : string?
+  +CreationDatetime : DateTime
+  +UpdateDatetime : DateTime?
+  +LastLoginAt : DateTime?
+  +IsArchived : bool
+  +IsDeleted : bool
+  +Role : RoleDto?
+}
+class UserCreateDto {
+  +Login : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +Password : string
+  +RoleId : long
+  +FullName : string
+}
+class UserUpdateDto {
+  +Id : long
+  +Login : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +RoleId : long
+  +FullName : string
+  +IsArchived : bool
+}
+class RoleDto {
+  +Id : long
+  +Name : string
+  +CreatedAt : DateTime
+}
+class RegistrationRequestDto {
+  +Login : string
+  +Password : string
+  +FullName : string
+  +TelegramUsername : string
+}
+class RegistrationRequestResponseDto {
+  +RegistrationId : Guid
+  +ExpiresAt : DateTime
+}
+class RegistrationConfirmDto {
+  +RegistrationId : Guid
+  +Code : string
+}
+class RegistrationBotStartDto {
+  +RegistrationId : Guid
+  +ChatId : long
+}
+class RegistrationResendDto {
+  +RegistrationId : Guid
+}
+class TelegramVerificationRequestDto {
+  +UserId : long
+  +TelegramUsername : string
+  +TelegramChatId : long?
+}
+class TelegramVerificationByLoginRequestDto {
+  +Login : string
+  +TelegramUsername : string?
+  +TelegramChatId : long?
+}
+class TelegramVerificationConfirmDto {
+  +UserId : long
+  +Code : string
+}
+class UserPreferenceDto {
+  +UserId : long
+  +Theme : string
+}
+class PasswordResetRequestDto {
+  +LoginOrTelegram : string
+}
+class PasswordResetCompleteDto {
+  +Token : Guid
+  +NewPassword : string
+}
+
+%% Level 4: поля + методы (без связей)
+classDiagram
+direction TB
+
+%% Доменные модели
+class AuditLog {
+  +Id : long
+  +UserId : long
+  +OperationTime : DateTime
+  +TableName : string
+  +OldData : string
+  +NewData : string
+}
+class Brand {
+  +Id : long
+  +Name : string
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+}
+class BrandSalesAnalyticsView {
+  +BrandId : long
+  +BrandName : string
+  +TotalOrders : int
+  +DeliveredOrders : int
+  +TotalUnits : int
+  +TotalRevenue : decimal
+  +AvgOrderValue : decimal
+}
+class DeliveredOrder {
+  +OrderId : long
+  +DeliveryDate : DateTime
+  +CourierName : string
+}
+class Material {
+  +Id : long
+  +Name : string
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+  +UpdatedAt : DateTime
+}
+class Order {
+  +Id : long
+  +UserId : long
+  +OrderStatusId : long
+  +PaymentStatusId : long
+  +OrderDate : DateTime
+  +TotalAmount : decimal
+  +DeliveryAddress : string?
+  +PaymentMethod : string?
+  +IsDeleted : bool
+}
+class OrderDetail {
+  +OrderId : long
+  +ProductId : long
+  +Quantity : int
+  +PriceAtMoment : decimal
+}
+class OrderStatus {
+  +Id : long
+  +Name : string
+  +CreatedAt : DateTime
+}
+class PasswordResetToken {
+  +Id : long
+  +UserId : long
+  +Token : Guid
+  +ExpiresAt : DateTime
+  +ConsumedAt : DateTime?
+  +IsRevoked : bool
+  +CreatedAt : DateTime
+}
+class PaymentStatus {
+  +Id : long
+  +Name : string
+  +CreatedAt : DateTime
+}
+class PendingRegistration {
+  +Id : Guid
+  +Login : string
+  +PasswordHash : string
+  +FullName : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +VerificationCode : string
+  +CreatedAt : DateTime
+  +ExpiresAt : DateTime
+  +ConsumedAt : DateTime?
+  +RoleId : long
+}
+class Product {
+  +Id : long
+  +Name : string
+  +Description : string?
+  +BrandId : long
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+  +UpdatedAt : DateTime
+}
+class ProductInventoryView {
+  +Id : long
+  +Name : string
+  +Description : string?
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+  +BrandName : string
+  +Materials : List<string>
+}
+class Role {
+  +Id : long
+  +Name : string
+  +CreatedAt : DateTime
+}
+class TelegramVerificationToken {
+  +Id : long
+  +UserId : long
+  +Code : string
+  +ExpiresAt : DateTime
+  +ConfirmedAt : DateTime?
+  +CreatedAt : DateTime
+}
+class User {
+  +Id : long
+  +Login : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +TelegramVerified : bool
+  +Password : string
+  +RoleId : long
+  +FullName : string?
+  +CreationDatetime : DateTime
+  +UpdateDatetime : DateTime?
+  +LastLoginAt : DateTime?
+  +IsArchived : bool
+  +IsDeleted : bool
+}
+class UserOrdersSummaryView {
+  +UserId : long
+  +Login : string
+  +TelegramUsername : string
+  +TotalOrders : int
+  +TotalSpent : decimal
+  +LastOrderAt : DateTime?
+}
+class UserPreference {
+  +UserId : long
+  +Theme : string
+  +UpdatedAt : DateTime
+}
+
+%% Контекст и инфраструктура
+class AppDbContext {
+  +AuditLogs : DbSet<AuditLog>
+  +Brands : DbSet<Brand>
+  +DeliveredOrders : DbSet<DeliveredOrder>
+  +Materials : DbSet<Material>
+  +Orders : DbSet<Order>
+  +OrderDetails : DbSet<OrderDetail>
+  +OrderStatuses : DbSet<OrderStatus>
+  +PaymentStatuses : DbSet<PaymentStatus>
+  +Products : DbSet<Product>
+  +Roles : DbSet<Role>
+  +Users : DbSet<User>
+  +ProductInventoryView : DbSet<ProductInventoryView>
+  +UserOrdersSummaryView : DbSet<UserOrdersSummaryView>
+  +BrandSalesAnalyticsView : DbSet<BrandSalesAnalyticsView>
+  +UserPreferences : DbSet<UserPreference>
+  +PasswordResetTokens : DbSet<PasswordResetToken>
+  +TelegramVerificationTokens : DbSet<TelegramVerificationToken>
+  +PendingRegistrations : DbSet<PendingRegistration>
+  +OnModelCreating(modelBuilder)
+}
+class Program {
+  +builder : WebApplicationBuilder
+  +app : WebApplication
+  +ConfigureLogging()
+  +ConfigureServices()
+  +ConfigurePipeline()
+}
+class ExceptionMiddleware {
+  -next : RequestDelegate
+  -logger : ILogger
+  +InvokeAsync(context)
+  -HandleExceptionAsync(context, exception)
+}
+class ShopMetrics {
+  <<static>>
+  +ActiveUsers : Gauge
+  +OrdersTotal : Gauge
+  +OrdersByStatus : Gauge
+  +ProductsInStock : Gauge
+}
+class ShopMetricsCollector {
+  -_scopeFactory : IServiceScopeFactory
+  -_logger : ILogger
+  -_interval : TimeSpan
+  +ExecuteAsync(stoppingToken)
+  -CollectSnapshot(token)
+}
+class IDatabaseDumpService {
+  <<interface>>
+  +CreateDumpAsync(token)
+  +RestoreDumpAsync(stream, token)
+}
+class DatabaseDumpOptions {
+  +PgDumpPath : string
+  +PsqlPath : string
+}
+class DatabaseDumpService {
+  -_contextFactory : IDbContextFactory<AppDbContext>
+  -_logger : ILogger
+  -_pgDumpPath : string
+  -_psqlPath : string
+  +CreateDumpAsync(token)
+  +RestoreDumpAsync(stream, token)
+}
+class ITelegramMessenger {
+  <<interface>>
+  +SendVerificationMessageAsync(chatId, code, token)
+  +SendPasswordResetTokenAsync(chatId, token, cancellationToken)
+}
+class TelegramOptions {
+  +BotToken : string
+  +VerificationTemplate : string
+  +PasswordResetTemplate : string
+}
+class TelegramMessenger {
+  -_httpClient : HttpClient
+  -_options : TelegramOptions
+  +SendVerificationMessageAsync(chatId, code, token)
+  +SendPasswordResetTokenAsync(chatId, token, cancellationToken)
+  -SendMessageAsync(chatId, text, token)
+}
+class RegistrationOptions {
+  +BotSecret : string
+  +DefaultRoleName : string
+  +VerificationCodeTtlMinutes : int
+}
+
+%% Контроллеры
+class AnalyticsController {
+  -context : AppDbContext
+  +GetDashboard()
+  +GetBrandSalesAnalytics()
+  +GetBrandRevenue(brandId, from, to)
+}
+class BrandController {
+  -context : AppDbContext
+  +GetBrands()
+  +GetBrand(id)
+  +PutBrand(id, brandDto)
+  +PostBrand(brandDto)
+  +DeleteBrand(id)
+}
+class DatabaseController {
+  -dumpService : IDatabaseDumpService
+  -logger : ILogger
+  +DownloadBackup(token)
+  +RestoreBackup(file, token)
+}
+class DeliveredOrderController {
+  -context : AppDbContext
+  +GetDeliveredOrders()
+  +GetDeliveredOrder(id)
+  +PutDeliveredOrder(id, dto)
+  +PostDeliveredOrder(dto)
+  +DeleteDeliveredOrder(id)
+}
+class MaterialController {
+  -context : AppDbContext
+  +GetMaterials()
+  +GetMaterial(id)
+  +PutMaterial(id, dto)
+  +PostMaterial(dto)
+  +DeleteMaterial(id)
+}
+class OrderController {
+  -context : AppDbContext
+  +GetOrders()
+  +GetOrder(id)
+  +PutOrder(id, dto)
+  +PostOrder(order)
+  +DeleteOrder(id)
+  +Checkout(request)
+}
+class OrderDetailController {
+  -context : AppDbContext
+  +GetOrderDetails()
+  +GetOrderDetail(id)
+  +PutOrderDetail(id, detail)
+  +PostOrderDetail(detail)
+  +DeleteOrderDetail(id)
+}
+class OrderStatusController {
+  -context : AppDbContext
+  +GetOrderStatuses()
+  +GetOrderStatus(id)
+  +PutOrderStatus(id, status)
+  +PostOrderStatus(status)
+  +DeleteOrderStatus(id)
+}
+class PaymentStatusController {
+  -context : AppDbContext
+  +GetPaymentStatuses()
+  +GetPaymentStatus(id)
+  +PutPaymentStatus(id, status)
+  +PostPaymentStatus(status)
+  +DeletePaymentStatus(id)
+}
+class ProductController {
+  -context : AppDbContext
+  +GetProducts()
+  +GetProductCatalog()
+  +GetProduct(id)
+  +PutProduct(id, dto)
+  +PostProduct(dto)
+  +DeleteProduct(id)
+}
+class RegistrationController {
+  -context : AppDbContext
+  -messenger : ITelegramMessenger
+  -options : RegistrationOptions
+  -logger : ILogger
+  +Request(dto)
+  +Resend(dto)
+  +Confirm(dto)
+  +BotStart(dto, secret)
+}
+class RoleController {
+  -context : AppDbContext
+  +GetRoles()
+  +GetRole(id)
+  +PutRole(id, role)
+  +PostRole(role)
+  +DeleteRole(id)
+}
+class TelegramVerificationController {
+  -context : AppDbContext
+  -messenger : ITelegramMessenger
+  -logger : ILogger
+  +RequestVerification(dto)
+  +RequestVerificationByLogin(dto)
+  +ConfirmVerification(dto)
+}
+class UserController {
+  -context : AppDbContext
+  -logger : ILogger
+  +GetUsers()
+  +GetUser(id)
+  +PutUser(id, dto)
+  +PostUser(dto)
+  +DeleteUser(id)
+}
+class UserPreferencesController {
+  -context : AppDbContext
+  +Get(userId)
+  +Upsert(userId, dto)
+}
+class PasswordResetController {
+  -context : AppDbContext
+  -messenger : ITelegramMessenger
+  -logger : ILogger
+  +RequestReset(dto)
+  +CompleteReset(dto)
+  +GetTokenStatus(token)
+}
+
+%% DTO
+class AnalyticsDashboardDto {
+  +TotalProducts : int
+  +TotalOrders : int
+  +TotalUsers : int
+  +TotalRevenue : decimal
+  +RecentOrders : IEnumerable<AnalyticsRecentOrderDto>
+  +LowStockProducts : IEnumerable<AnalyticsLowStockProductDto>
+  +TopCustomers : IEnumerable<UserOrdersSummaryView>
+  +SalesByBrand : IEnumerable<SalesByBrandDto>
+  +RevenueTrend : IEnumerable<RevenueTrendPointDto>
+}
+class AnalyticsRecentOrderDto {
+  +Id : long
+  +Customer : string
+  +OrderStatus : string
+  +PaymentStatus : string
+  +OrderDate : DateTime
+}
+class AnalyticsLowStockProductDto {
+  +Id : long
+  +Name : string
+  +Brand : string
+  +StockQuantity : int
+}
+class SalesByBrandDto {
+  +BrandId : long
+  +Brand : string
+  +Orders : int
+  +DeliveredOrders : int
+  +Units : int
+  +Revenue : decimal
+  +AverageOrderValue : decimal
+}
+class RevenueTrendPointDto {
+  +Date : DateTime
+  +Revenue : decimal
+  +Orders : int
+}
+class BrandRevenueDto {
+  +BrandId : long
+  +BrandName : string
+  +Revenue : decimal
+  +DateFrom : DateTime
+  +DateTo : DateTime
+}
+class BrandDto {
+  +Id : long
+  +Name : string
+}
+class BrandCreateDto {
+  +Name : string
+}
+class MaterialDto {
+  +Id : long
+  +Name : string
+}
+class MaterialCreateDto {
+  +Name : string
+}
+class ProductListItemDto {
+  +Id : long
+  +Name : string
+  +Description : string?
+  +BrandId : long
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+  +UpdatedAt : DateTime
+  +Brand : ProductBrandDto
+}
+class ProductBrandDto {
+  +Id : long
+  +Name : string
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+}
+class ProductUpdateDto {
+  +Id : long
+  +Name : string
+  +Description : string?
+  +BrandId : long
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+}
+class ProductCreateDto {
+  +Name : string
+  +Description : string?
+  +BrandId : long
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+}
+class OrderDto {
+  +Id : long
+  +UserId : long
+  +OrderStatusId : long
+  +PaymentStatusId : long
+  +OrderDate : DateTime
+}
+class OrderCreateDto {
+  +UserId : long
+  +OrderStatusId : long
+  +PaymentStatusId : long
+}
+class OrderStatusUpdateDto {
+  +Id : long
+  +OrderStatusId : long
+  +PaymentStatusId : long
+  +DeliveryDate : DateTime?
+  +CourierName : string?
+}
+class OrderSummaryDto {
+  +Id : long
+  +UserId : long
+  +OrderDate : DateTime
+  +TotalAmount : decimal
+  +OrderStatusId : long
+  +OrderStatus : string
+  +PaymentStatusId : long
+  +PaymentStatus : string
+  +CustomerLogin : string?
+  +CustomerTelegram : string?
+  +CustomerName : string?
+  +DeliveredOrder : DeliveredOrderSummaryDto?
+}
+class OrderItemDto {
+  +ProductId : long
+  +ProductName : string
+  +Quantity : int
+  +PriceAtMoment : decimal
+}
+class OrderDetailsDto {
+  +Items : List<OrderItemDto>
+}
+class DeliveredOrderSummaryDto {
+  +OrderId : long
+  +DeliveryDate : DateTime
+  +CourierName : string
+}
+class DeliveredOrderDto {
+  +OrderId : long
+  +DeliveryDate : DateTime
+  +CourierName : string
+}
+class CheckoutItemDto {
+  +ProductId : long
+  +Quantity : int
+}
+class CreateOrderRequestDto {
+  +UserId : long
+  +Items : List<CheckoutItemDto>
+  +PaymentStatusId : long?
+  +OrderStatusId : long?
+}
+class CheckoutResultDto {
+  +OrderId : long
+  +TotalAmount : decimal
+}
+class UserDto {
+  +Id : long
+  +Login : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +TelegramVerified : bool
+  +RoleId : long
+  +FullName : string?
+  +CreationDatetime : DateTime
+  +UpdateDatetime : DateTime?
+  +LastLoginAt : DateTime?
+  +IsArchived : bool
+  +IsDeleted : bool
+  +Role : RoleDto?
+}
+class UserCreateDto {
+  +Login : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +Password : string
+  +RoleId : long
+  +FullName : string
+}
+class UserUpdateDto {
+  +Id : long
+  +Login : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +RoleId : long
+  +FullName : string
+  +IsArchived : bool
+}
+class RoleDto {
+  +Id : long
+  +Name : string
+  +CreatedAt : DateTime
+}
+class RegistrationRequestDto {
+  +Login : string
+  +Password : string
+  +FullName : string
+  +TelegramUsername : string
+}
+class RegistrationRequestResponseDto {
+  +RegistrationId : Guid
+  +ExpiresAt : DateTime
+}
+class RegistrationConfirmDto {
+  +RegistrationId : Guid
+  +Code : string
+}
+class RegistrationBotStartDto {
+  +RegistrationId : Guid
+  +ChatId : long
+}
+class RegistrationResendDto {
+  +RegistrationId : Guid
+}
+class TelegramVerificationRequestDto {
+  +UserId : long
+  +TelegramUsername : string
+  +TelegramChatId : long?
+}
+class TelegramVerificationByLoginRequestDto {
+  +Login : string
+  +TelegramUsername : string?
+  +TelegramChatId : long?
+}
+class TelegramVerificationConfirmDto {
+  +UserId : long
+  +Code : string
+}
+class UserPreferenceDto {
+  +UserId : long
+  +Theme : string
+}
+class PasswordResetRequestDto {
+  +LoginOrTelegram : string
+}
+class PasswordResetCompleteDto {
+  +Token : Guid
+  +NewPassword : string
+}
+
+%% Level 5: поля + методы + связи
+classDiagram
+direction TB
+
+%% Доменные модели
+class AuditLog {
+  +Id : long
+  +UserId : long
+  +OperationTime : DateTime
+  +TableName : string
+  +OldData : string
+  +NewData : string
+}
+class Brand {
+  +Id : long
+  +Name : string
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+}
+class BrandSalesAnalyticsView {
+  +BrandId : long
+  +BrandName : string
+  +TotalOrders : int
+  +DeliveredOrders : int
+  +TotalUnits : int
+  +TotalRevenue : decimal
+  +AvgOrderValue : decimal
+}
+class DeliveredOrder {
+  +OrderId : long
+  +DeliveryDate : DateTime
+  +CourierName : string
+}
+class Material {
+  +Id : long
+  +Name : string
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+  +UpdatedAt : DateTime
+}
+class Order {
+  +Id : long
+  +UserId : long
+  +OrderStatusId : long
+  +PaymentStatusId : long
+  +OrderDate : DateTime
+  +TotalAmount : decimal
+  +DeliveryAddress : string?
+  +PaymentMethod : string?
+  +IsDeleted : bool
+}
+class OrderDetail {
+  +OrderId : long
+  +ProductId : long
+  +Quantity : int
+  +PriceAtMoment : decimal
+}
+class OrderStatus {
+  +Id : long
+  +Name : string
+  +CreatedAt : DateTime
+}
+class PasswordResetToken {
+  +Id : long
+  +UserId : long
+  +Token : Guid
+  +ExpiresAt : DateTime
+  +ConsumedAt : DateTime?
+  +IsRevoked : bool
+  +CreatedAt : DateTime
+}
+class PaymentStatus {
+  +Id : long
+  +Name : string
+  +CreatedAt : DateTime
+}
+class PendingRegistration {
+  +Id : Guid
+  +Login : string
+  +PasswordHash : string
+  +FullName : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +VerificationCode : string
+  +CreatedAt : DateTime
+  +ExpiresAt : DateTime
+  +ConsumedAt : DateTime?
+  +RoleId : long
+}
+class Product {
+  +Id : long
+  +Name : string
+  +Description : string?
+  +BrandId : long
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+  +UpdatedAt : DateTime
+}
+class ProductInventoryView {
+  +Id : long
+  +Name : string
+  +Description : string?
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+  +BrandName : string
+  +Materials : List<string>
+}
+class Role {
+  +Id : long
+  +Name : string
+  +CreatedAt : DateTime
+}
+class TelegramVerificationToken {
+  +Id : long
+  +UserId : long
+  +Code : string
+  +ExpiresAt : DateTime
+  +ConfirmedAt : DateTime?
+  +CreatedAt : DateTime
+}
+class User {
+  +Id : long
+  +Login : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +TelegramVerified : bool
+  +Password : string
+  +RoleId : long
+  +FullName : string?
+  +CreationDatetime : DateTime
+  +UpdateDatetime : DateTime?
+  +LastLoginAt : DateTime?
+  +IsArchived : bool
+  +IsDeleted : bool
+}
+class UserOrdersSummaryView {
+  +UserId : long
+  +Login : string
+  +TelegramUsername : string
+  +TotalOrders : int
+  +TotalSpent : decimal
+  +LastOrderAt : DateTime?
+}
+class UserPreference {
+  +UserId : long
+  +Theme : string
+  +UpdatedAt : DateTime
+}
+
+%% Контекст и инфраструктура
+class AppDbContext {
+  +AuditLogs : DbSet<AuditLog>
+  +Brands : DbSet<Brand>
+  +DeliveredOrders : DbSet<DeliveredOrder>
+  +Materials : DbSet<Material>
+  +Orders : DbSet<Order>
+  +OrderDetails : DbSet<OrderDetail>
+  +OrderStatuses : DbSet<OrderStatus>
+  +PaymentStatuses : DbSet<PaymentStatus>
+  +Products : DbSet<Product>
+  +Roles : DbSet<Role>
+  +Users : DbSet<User>
+  +ProductInventoryView : DbSet<ProductInventoryView>
+  +UserOrdersSummaryView : DbSet<UserOrdersSummaryView>
+  +BrandSalesAnalyticsView : DbSet<BrandSalesAnalyticsView>
+  +UserPreferences : DbSet<UserPreference>
+  +PasswordResetTokens : DbSet<PasswordResetToken>
+  +TelegramVerificationTokens : DbSet<TelegramVerificationToken>
+  +PendingRegistrations : DbSet<PendingRegistration>
+  +OnModelCreating(modelBuilder)
+}
+class Program {
+  +builder : WebApplicationBuilder
+  +app : WebApplication
+  +ConfigureLogging()
+  +ConfigureServices()
+  +ConfigurePipeline()
+}
+class ExceptionMiddleware {
+  -next : RequestDelegate
+  -logger : ILogger
+  +InvokeAsync(context)
+  -HandleExceptionAsync(context, exception)
+}
+class ShopMetrics {
+  <<static>>
+  +ActiveUsers : Gauge
+  +OrdersTotal : Gauge
+  +OrdersByStatus : Gauge
+  +ProductsInStock : Gauge
+}
+class ShopMetricsCollector {
+  -_scopeFactory : IServiceScopeFactory
+  -_logger : ILogger
+  -_interval : TimeSpan
+  +ExecuteAsync(stoppingToken)
+  -CollectSnapshot(token)
+}
+class IDatabaseDumpService {
+  <<interface>>
+  +CreateDumpAsync(token)
+  +RestoreDumpAsync(stream, token)
+}
+class DatabaseDumpOptions {
+  +PgDumpPath : string
+  +PsqlPath : string
+}
+class DatabaseDumpService {
+  -_contextFactory : IDbContextFactory<AppDbContext>
+  -_logger : ILogger
+  -_pgDumpPath : string
+  -_psqlPath : string
+  +CreateDumpAsync(token)
+  +RestoreDumpAsync(stream, token)
+}
+class ITelegramMessenger {
+  <<interface>>
+  +SendVerificationMessageAsync(chatId, code, token)
+  +SendPasswordResetTokenAsync(chatId, token, cancellationToken)
+}
+class TelegramOptions {
+  +BotToken : string
+  +VerificationTemplate : string
+  +PasswordResetTemplate : string
+}
+class TelegramMessenger {
+  -_httpClient : HttpClient
+  -_options : TelegramOptions
+  +SendVerificationMessageAsync(chatId, code, token)
+  +SendPasswordResetTokenAsync(chatId, token, cancellationToken)
+  -SendMessageAsync(chatId, text, token)
+}
+class RegistrationOptions {
+  +BotSecret : string
+  +DefaultRoleName : string
+  +VerificationCodeTtlMinutes : int
+}
+
+%% Контроллеры
+class AnalyticsController {
+  -context : AppDbContext
+  +GetDashboard()
+  +GetBrandSalesAnalytics()
+  +GetBrandRevenue(brandId, from, to)
+}
+class BrandController {
+  -context : AppDbContext
+  +GetBrands()
+  +GetBrand(id)
+  +PutBrand(id, brandDto)
+  +PostBrand(brandDto)
+  +DeleteBrand(id)
+}
+class DatabaseController {
+  -dumpService : IDatabaseDumpService
+  -logger : ILogger
+  +DownloadBackup(token)
+  +RestoreBackup(file, token)
+}
+class DeliveredOrderController {
+  -context : AppDbContext
+  +GetDeliveredOrders()
+  +GetDeliveredOrder(id)
+  +PutDeliveredOrder(id, dto)
+  +PostDeliveredOrder(dto)
+  +DeleteDeliveredOrder(id)
+}
+class MaterialController {
+  -context : AppDbContext
+  +GetMaterials()
+  +GetMaterial(id)
+  +PutMaterial(id, dto)
+  +PostMaterial(dto)
+  +DeleteMaterial(id)
+}
+class OrderController {
+  -context : AppDbContext
+  +GetOrders()
+  +GetOrder(id)
+  +PutOrder(id, dto)
+  +PostOrder(order)
+  +DeleteOrder(id)
+  +Checkout(request)
+}
+class OrderDetailController {
+  -context : AppDbContext
+  +GetOrderDetails()
+  +GetOrderDetail(id)
+  +PutOrderDetail(id, detail)
+  +PostOrderDetail(detail)
+  +DeleteOrderDetail(id)
+}
+class OrderStatusController {
+  -context : AppDbContext
+  +GetOrderStatuses()
+  +GetOrderStatus(id)
+  +PutOrderStatus(id, status)
+  +PostOrderStatus(status)
+  +DeleteOrderStatus(id)
+}
+class PaymentStatusController {
+  -context : AppDbContext
+  +GetPaymentStatuses()
+  +GetPaymentStatus(id)
+  +PutPaymentStatus(id, status)
+  +PostPaymentStatus(status)
+  +DeletePaymentStatus(id)
+}
+class ProductController {
+  -context : AppDbContext
+  +GetProducts()
+  +GetProductCatalog()
+  +GetProduct(id)
+  +PutProduct(id, dto)
+  +PostProduct(dto)
+  +DeleteProduct(id)
+}
+class RegistrationController {
+  -context : AppDbContext
+  -messenger : ITelegramMessenger
+  -options : RegistrationOptions
+  -logger : ILogger
+  +Request(dto)
+  +Resend(dto)
+  +Confirm(dto)
+  +BotStart(dto, secret)
+}
+class RoleController {
+  -context : AppDbContext
+  +GetRoles()
+  +GetRole(id)
+  +PutRole(id, role)
+  +PostRole(role)
+  +DeleteRole(id)
+}
+class TelegramVerificationController {
+  -context : AppDbContext
+  -messenger : ITelegramMessenger
+  -logger : ILogger
+  +RequestVerification(dto)
+  +RequestVerificationByLogin(dto)
+  +ConfirmVerification(dto)
+}
+class UserController {
+  -context : AppDbContext
+  -logger : ILogger
+  +GetUsers()
+  +GetUser(id)
+  +PutUser(id, dto)
+  +PostUser(dto)
+  +DeleteUser(id)
+}
+class UserPreferencesController {
+  -context : AppDbContext
+  +Get(userId)
+  +Upsert(userId, dto)
+}
+class PasswordResetController {
+  -context : AppDbContext
+  -messenger : ITelegramMessenger
+  -logger : ILogger
+  +RequestReset(dto)
+  +CompleteReset(dto)
+  +GetTokenStatus(token)
+}
+
+%% DTO
+class AnalyticsDashboardDto {
+  +TotalProducts : int
+  +TotalOrders : int
+  +TotalUsers : int
+  +TotalRevenue : decimal
+  +RecentOrders : IEnumerable<AnalyticsRecentOrderDto>
+  +LowStockProducts : IEnumerable<AnalyticsLowStockProductDto>
+  +TopCustomers : IEnumerable<UserOrdersSummaryView>
+  +SalesByBrand : IEnumerable<SalesByBrandDto>
+  +RevenueTrend : IEnumerable<RevenueTrendPointDto>
+}
+class AnalyticsRecentOrderDto {
+  +Id : long
+  +Customer : string
+  +OrderStatus : string
+  +PaymentStatus : string
+  +OrderDate : DateTime
+}
+class AnalyticsLowStockProductDto {
+  +Id : long
+  +Name : string
+  +Brand : string
+  +StockQuantity : int
+}
+class SalesByBrandDto {
+  +BrandId : long
+  +Brand : string
+  +Orders : int
+  +DeliveredOrders : int
+  +Units : int
+  +Revenue : decimal
+  +AverageOrderValue : decimal
+}
+class RevenueTrendPointDto {
+  +Date : DateTime
+  +Revenue : decimal
+  +Orders : int
+}
+class BrandRevenueDto {
+  +BrandId : long
+  +BrandName : string
+  +Revenue : decimal
+  +DateFrom : DateTime
+  +DateTo : DateTime
+}
+class BrandDto {
+  +Id : long
+  +Name : string
+}
+class BrandCreateDto {
+  +Name : string
+}
+class MaterialDto {
+  +Id : long
+  +Name : string
+}
+class MaterialCreateDto {
+  +Name : string
+}
+class ProductListItemDto {
+  +Id : long
+  +Name : string
+  +Description : string?
+  +BrandId : long
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+  +UpdatedAt : DateTime
+  +Brand : ProductBrandDto
+}
+class ProductBrandDto {
+  +Id : long
+  +Name : string
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+}
+class ProductUpdateDto {
+  +Id : long
+  +Name : string
+  +Description : string?
+  +BrandId : long
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+}
+class ProductCreateDto {
+  +Name : string
+  +Description : string?
+  +BrandId : long
+  +Price : decimal
+  +StockQuantity : int
+  +ImageUrl : string?
+}
+class OrderDto {
+  +Id : long
+  +UserId : long
+  +OrderStatusId : long
+  +PaymentStatusId : long
+  +OrderDate : DateTime
+}
+class OrderCreateDto {
+  +UserId : long
+  +OrderStatusId : long
+  +PaymentStatusId : long
+}
+class OrderStatusUpdateDto {
+  +Id : long
+  +OrderStatusId : long
+  +PaymentStatusId : long
+  +DeliveryDate : DateTime?
+  +CourierName : string?
+}
+class OrderSummaryDto {
+  +Id : long
+  +UserId : long
+  +OrderDate : DateTime
+  +TotalAmount : decimal
+  +OrderStatusId : long
+  +OrderStatus : string
+  +PaymentStatusId : long
+  +PaymentStatus : string
+  +CustomerLogin : string?
+  +CustomerTelegram : string?
+  +CustomerName : string?
+  +DeliveredOrder : DeliveredOrderSummaryDto?
+}
+class OrderItemDto {
+  +ProductId : long
+  +ProductName : string
+  +Quantity : int
+  +PriceAtMoment : decimal
+}
+class OrderDetailsDto {
+  +Items : List<OrderItemDto>
+}
+class DeliveredOrderSummaryDto {
+  +OrderId : long
+  +DeliveryDate : DateTime
+  +CourierName : string
+}
+class DeliveredOrderDto {
+  +OrderId : long
+  +DeliveryDate : DateTime
+  +CourierName : string
+}
+class CheckoutItemDto {
+  +ProductId : long
+  +Quantity : int
+}
+class CreateOrderRequestDto {
+  +UserId : long
+  +Items : List<CheckoutItemDto>
+  +PaymentStatusId : long?
+  +OrderStatusId : long?
+}
+class CheckoutResultDto {
+  +OrderId : long
+  +TotalAmount : decimal
+}
+class UserDto {
+  +Id : long
+  +Login : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +TelegramVerified : bool
+  +RoleId : long
+  +FullName : string?
+  +CreationDatetime : DateTime
+  +UpdateDatetime : DateTime?
+  +LastLoginAt : DateTime?
+  +IsArchived : bool
+  +IsDeleted : bool
+  +Role : RoleDto?
+}
+class UserCreateDto {
+  +Login : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +Password : string
+  +RoleId : long
+  +FullName : string
+}
+class UserUpdateDto {
+  +Id : long
+  +Login : string
+  +TelegramUsername : string
+  +TelegramChatId : long?
+  +RoleId : long
+  +FullName : string
+  +IsArchived : bool
+}
+class RoleDto {
+  +Id : long
+  +Name : string
+  +CreatedAt : DateTime
+}
+class RegistrationRequestDto {
+  +Login : string
+  +Password : string
+  +FullName : string
+  +TelegramUsername : string
+}
+class RegistrationRequestResponseDto {
+  +RegistrationId : Guid
+  +ExpiresAt : DateTime
+}
+class RegistrationConfirmDto {
+  +RegistrationId : Guid
+  +Code : string
+}
+class RegistrationBotStartDto {
+  +RegistrationId : Guid
+  +ChatId : long
+}
+class RegistrationResendDto {
+  +RegistrationId : Guid
+}
+class TelegramVerificationRequestDto {
+  +UserId : long
+  +TelegramUsername : string
+  +TelegramChatId : long?
+}
+class TelegramVerificationByLoginRequestDto {
+  +Login : string
+  +TelegramUsername : string?
+  +TelegramChatId : long?
+}
+class TelegramVerificationConfirmDto {
+  +UserId : long
+  +Code : string
+}
+class UserPreferenceDto {
+  +UserId : long
+  +Theme : string
+}
+class PasswordResetRequestDto {
+  +LoginOrTelegram : string
+}
+class PasswordResetCompleteDto {
+  +Token : Guid
+  +NewPassword : string
+}
+
+%% Наследование и реализации
+IDatabaseDumpService <|.. DatabaseDumpService
+ITelegramMessenger <|.. TelegramMessenger
+OrderSummaryDto <|-- OrderDetailsDto
+
+%% Связи доменной модели
+AppDbContext "1" o-- "*" Brand
+AppDbContext "1" o-- "*" Material
+AppDbContext "1" o-- "*" Product
+AppDbContext "1" o-- "*" Order
+AppDbContext "1" o-- "*" OrderDetail
+AppDbContext "1" o-- "*" DeliveredOrder
+AppDbContext "1" o-- "*" OrderStatus
+AppDbContext "1" o-- "*" PaymentStatus
+AppDbContext "1" o-- "*" Role
+AppDbContext "1" o-- "*" User
+AppDbContext "1" o-- "*" AuditLog
+AppDbContext "1" o-- "*" UserPreference
+AppDbContext "1" o-- "*" PasswordResetToken
+AppDbContext "1" o-- "*" TelegramVerificationToken
+AppDbContext "1" o-- "*" PendingRegistration
+AppDbContext "1" o-- "*" ProductInventoryView
+AppDbContext "1" o-- "*" UserOrdersSummaryView
+AppDbContext "1" o-- "*" BrandSalesAnalyticsView
+
+Brand "1" o-- "*" Product
+Product "*" -- "*" Material
+Order "1" *-- "*" OrderDetail
+OrderDetail "*" --> "1" Product
+Order "*" --> "1" OrderStatus
+Order "*" --> "1" PaymentStatus
+Order "*" --> "1" User
+Order "1" *-- "0..1" DeliveredOrder
+User "1" o-- "*" Order
+User "1" o-- "*" AuditLog
+User "1" *-- "*" PasswordResetToken
+User "1" *-- "*" TelegramVerificationToken
+User "1" *-- "0..1" UserPreference
+Role "1" o-- "*" User
+PendingRegistration "*" --> "1" Role
+
+%% Связи инфраструктуры и контроллеров
+Program ..> AppDbContext
+Program ..> ExceptionMiddleware
+Program ..> ShopMetricsCollector
+Program ..> DatabaseDumpService
+Program ..> TelegramMessenger
+Program ..> TelegramOptions
+Program ..> RegistrationOptions
+Program ..> DatabaseDumpOptions
+Program ..> ShopMetrics
+
+ShopMetricsCollector ..> AppDbContext
+ShopMetricsCollector ..> ShopMetrics
+
+DatabaseDumpService ..> DatabaseDumpOptions
+DatabaseDumpService ..> AppDbContext
+DatabaseController ..> IDatabaseDumpService
+
+TelegramMessenger ..> TelegramOptions
+RegistrationController ..> ITelegramMessenger
+TelegramVerificationController ..> ITelegramMessenger
+PasswordResetController ..> ITelegramMessenger
+
+BrandController ..> AppDbContext
+BrandController ..> BrandDto
+BrandController ..> BrandCreateDto
+
+MaterialController ..> AppDbContext
+MaterialController ..> MaterialDto
+MaterialController ..> MaterialCreateDto
+
+ProductController ..> AppDbContext
+ProductController ..> Product
+ProductController ..> ProductUpdateDto
+ProductController ..> ProductCreateDto
+ProductController ..> ProductListItemDto
+ProductController ..> ProductInventoryView
+ProductListItemDto --> ProductBrandDto
+
+OrderController ..> AppDbContext
+OrderController ..> Order
+OrderController ..> OrderStatusUpdateDto
+OrderController ..> OrderSummaryDto
+OrderController ..> OrderDetailsDto
+OrderController ..> OrderItemDto
+OrderController ..> DeliveredOrderSummaryDto
+OrderController ..> CreateOrderRequestDto
+OrderController ..> CheckoutResultDto
+CreateOrderRequestDto "1" *-- "*" CheckoutItemDto
+OrderSummaryDto "0..1" --> DeliveredOrderSummaryDto
+OrderDetailsDto "1" *-- "*" OrderItemDto
+
+DeliveredOrderController ..> AppDbContext
+DeliveredOrderController ..> DeliveredOrder
+DeliveredOrderController ..> DeliveredOrderDto
+
+OrderDetailController ..> AppDbContext
+OrderDetailController ..> OrderDetail
+
+OrderStatusController ..> AppDbContext
+OrderStatusController ..> OrderStatus
+
+PaymentStatusController ..> AppDbContext
+PaymentStatusController ..> PaymentStatus
+
+RoleController ..> AppDbContext
+RoleController ..> Role
+RoleController ..> RoleDto
+
+UserController ..> AppDbContext
+UserController ..> User
+UserController ..> UserDto
+UserController ..> UserCreateDto
+UserController ..> UserUpdateDto
+UserDto --> RoleDto
+
+UserPreferencesController ..> AppDbContext
+UserPreferencesController ..> UserPreference
+UserPreferencesController ..> UserPreferenceDto
+
+AnalyticsController ..> AppDbContext
+AnalyticsController ..> AnalyticsDashboardDto
+AnalyticsController ..> SalesByBrandDto
+AnalyticsController ..> BrandRevenueDto
+AnalyticsDashboardDto *-- AnalyticsRecentOrderDto
+AnalyticsDashboardDto *-- AnalyticsLowStockProductDto
+AnalyticsDashboardDto *-- UserOrdersSummaryView
+AnalyticsDashboardDto *-- SalesByBrandDto
+AnalyticsDashboardDto *-- RevenueTrendPointDto
+
+RegistrationController ..> AppDbContext
+RegistrationController ..> RegistrationRequestDto
+RegistrationController ..> RegistrationRequestResponseDto
+RegistrationController ..> RegistrationConfirmDto
+RegistrationController ..> RegistrationBotStartDto
+RegistrationController ..> RegistrationResendDto
+RegistrationController ..> RegistrationOptions
+
+TelegramVerificationController ..> AppDbContext
+TelegramVerificationController ..> TelegramVerificationRequestDto
+TelegramVerificationController ..> TelegramVerificationByLoginRequestDto
+TelegramVerificationController ..> TelegramVerificationConfirmDto
+TelegramVerificationController ..> TelegramVerificationToken
+
+PasswordResetController ..> AppDbContext
+PasswordResetController ..> PasswordResetToken
+PasswordResetController ..> PasswordResetRequestDto
+PasswordResetController ..> PasswordResetCompleteDto
+
+DatabaseController ..> DatabaseDumpOptions

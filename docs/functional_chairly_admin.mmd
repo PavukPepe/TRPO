@@ -1,0 +1,55 @@
+```mermaid
+graph TD
+    SSO[SSO / JWT Вход + Refresh] --> Dashboard[Панель управления]
+    Forgot[Сброс пароля по email/token] --> SSO
+
+    Dashboard --> Users[Пользователи]
+    Dashboard --> Roles[Роли и доступы]
+    Dashboard --> Catalog[Каталог]
+    Dashboard --> Orders[Заказы + Доставка]
+    Dashboard --> Analytics[Аналитика]
+    Dashboard --> Backup[Бэкапы БД]
+    Dashboard --> Audit[Журнал аудита]
+
+    Users --> UserCreate[Создание/редактирование]
+    Users --> UserBlock[Блокировка/разблокировка]
+    Users --> UserReset[Инициировать сброс пароля]
+    Users --> UserActivity[Статус активности]
+
+    Roles --> RoleCRUD[Создание/изменение ролей]
+    Roles --> RolePerms[Настройка прав]
+
+    Catalog --> Brands[Бренды CRUD]
+    Catalog --> Materials[Материалы CRUD]
+    Catalog --> Products[Товары CRUD]
+    Products --> ProductStock[Остатки на складе]
+    Products --> ProductMedia[Фото/описание/цена]
+    Products --> ProductRestore[Удаление/восстановление]
+
+    Orders --> OrdersList[Просмотр списков]
+    Orders --> OrderDetails[Детали заказа]
+    Orders --> OrderStatus[Статусы заказа: обработка, доставка, доставлен, отменён]
+    Orders --> PaymentStatus[Статусы оплаты]
+    Orders --> Delivery[Назначить курьера + дату доставки]
+    Orders --> Delivered[Доставленные заказы]
+
+    Analytics --> SalesBrand[Диаграммы продаж по брендам]
+    Analytics --> Reports[Отчёты из представлений/процедур]
+    Analytics --> Export[Экспорт CSV/PDF]
+
+    Backup --> PgDump[Скачивание дампа]
+    Backup --> PgRestore[Восстановление SQL]
+
+    Audit --> AuditView[Просмотр действий пользователей]
+
+    style SSO fill:#e3f2fd
+    style Dashboard fill:#c8e6c9
+    style Users fill:#f8bbd0
+    style Roles fill:#f8bbd0
+    style Catalog fill:#ffe0b2
+    style Products fill:#ffe0b2
+    style Orders fill:#d1c4e9
+    style Analytics fill:#f0f4c3
+    style Backup fill:#ffecb3
+    style Audit fill:#dcedc8
+```

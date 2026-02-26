@@ -1,0 +1,311 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- ======================================================= -->
+    <!-- СИСТЕМНАЯ ГРАНИЦА                                        -->
+    <!-- ======================================================= -->
+    <mxCell id="sys" value="&lt;b&gt;MultiChat Hub — SaaS-платформа&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;fontSize=14;fontStyle=1;verticalAlign=top;arcSize=2;" vertex="1" parent="1">
+      <mxGeometry x="185" y="10" width="1260" height="1140" as="geometry" />
+    </mxCell>
+
+    <!-- ======================================================= -->
+    <!-- АКТОРЫ (вне системы)                                     -->
+    <!-- ======================================================= -->
+
+    <!-- Клиент -->
+    <mxCell id="a1" value="Клиент" style="shape=umlActor;align=center;html=1;verticalLabelPosition=bottom;verticalAlign=top;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="45" y="200" width="60" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- Telegram-пользователь -->
+    <mxCell id="a2" value="Telegram-пользователь" style="shape=umlActor;align=center;html=1;verticalLabelPosition=bottom;verticalAlign=top;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="45" y="680" width="60" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- Менеджер -->
+    <mxCell id="a3" value="Менеджер" style="shape=umlActor;align=center;html=1;verticalLabelPosition=bottom;verticalAlign=top;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1530" y="100" width="60" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- РОП -->
+    <mxCell id="a4" value="РОП" style="shape=umlActor;align=center;html=1;verticalLabelPosition=bottom;verticalAlign=top;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1530" y="440" width="60" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- Администратор -->
+    <mxCell id="a5" value="Администратор" style="shape=umlActor;align=center;html=1;verticalLabelPosition=bottom;verticalAlign=top;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1530" y="790" width="60" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- Обобщение: РОП наследует Менеджера -->
+    <mxCell id="gen1" value="" style="endArrow=block;endFill=0;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="a4" target="a3" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Обобщение: Администратор наследует РОП -->
+    <mxCell id="gen2" value="" style="endArrow=block;endFill=0;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="a5" target="a4" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ======================================================= -->
+    <!-- ГРУППА 1: Аутентификация                                 -->
+    <!-- ======================================================= -->
+    <mxCell id="g_auth" value="Аутентификация" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;fontStyle=2;verticalAlign=top;arcSize=5;fontColor=#333333;" vertex="1" parent="1">
+      <mxGeometry x="595" y="20" width="430" height="100" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc01" value="Войти в систему" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="610" y="45" width="185" height="50" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc02" value="Восстановить пароль" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="825" y="45" width="185" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- ======================================================= -->
+    <!-- ГРУППА 2: Виджет (клиентские прецеденты)                 -->
+    <!-- ======================================================= -->
+    <mxCell id="g_widget" value="Виджет чата" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;fontStyle=2;verticalAlign=top;arcSize=5;fontColor=#333333;" vertex="1" parent="1">
+      <mxGeometry x="195" y="140" width="235" height="360" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc03" value="Открыть виджет" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="205" y="165" width="215" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc04" value="Начать чат (ввести имя)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="205" y="230" width="215" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc05" value="Отправить сообщение" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="205" y="295" width="215" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc06" value="Прикрепить файл" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="205" y="360" width="215" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc07" value="Оценить разговор" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="205" y="425" width="215" height="45" as="geometry" />
+    </mxCell>
+
+    <!-- ======================================================= -->
+    <!-- ГРУППА 3: Telegram (клиентские прецеденты)               -->
+    <!-- ======================================================= -->
+    <mxCell id="g_tg" value="Telegram" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;fontStyle=2;verticalAlign=top;arcSize=5;fontColor=#333333;" vertex="1" parent="1">
+      <mxGeometry x="195" y="660" width="235" height="160" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc08" value="Написать через Telegram" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="205" y="685" width="215" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc09" value="Получить автоответ" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="205" y="750" width="215" height="45" as="geometry" />
+    </mxCell>
+
+    <!-- ======================================================= -->
+    <!-- ГРУППА 4: Работа с чатами (менеджер и выше)              -->
+    <!-- ======================================================= -->
+    <mxCell id="g_chats" value="Работа с чатами" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;fontStyle=2;verticalAlign=top;arcSize=5;fontColor=#333333;" vertex="1" parent="1">
+      <mxGeometry x="470" y="140" width="680" height="490" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc10" value="Просмотреть список чатов" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="480" y="165" width="200" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc11" value="Ответить клиенту" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="480" y="230" width="200" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc12" value="Прикрепить файл к ответу" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="480" y="295" width="200" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc13" value="Использовать шаблон ответа" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="480" y="360" width="200" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc14" value="Получать уведомления (WS)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="480" y="425" width="200" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc15" value="Назначить менеджера на чат" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="720" y="165" width="200" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc16" value="Изменить статус чата" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="720" y="230" width="200" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc17" value="Закрыть чат" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="720" y="295" width="200" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc18" value="Объединить чаты" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="720" y="360" width="200" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc19" value="Авто-назначить чат менеджеру" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="720" y="425" width="200" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc20" value="Запросить оценку у клиента" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="600" y="505" width="200" height="45" as="geometry" />
+    </mxCell>
+
+    <!-- ======================================================= -->
+    <!-- ГРУППА 5: Аналитика                                      -->
+    <!-- ======================================================= -->
+    <mxCell id="g_stats" value="Аналитика и отчёты" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;fontStyle=2;verticalAlign=top;arcSize=5;fontColor=#333333;" vertex="1" parent="1">
+      <mxGeometry x="470" y="665" width="680" height="165" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc21" value="Просмотреть общую статистику" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="480" y="695" width="200" height="50" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc22" value="Статистика по менеджерам" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="720" y="695" width="200" height="50" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc23" value="Экспортировать отчёт PDF" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="600" y="760" width="200" height="45" as="geometry" />
+    </mxCell>
+
+    <!-- ======================================================= -->
+    <!-- ГРУППА 6: Управление сайтами (только Администратор)      -->
+    <!-- ======================================================= -->
+    <mxCell id="g_sites" value="Управление сайтами и виджетом" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;fontStyle=2;verticalAlign=top;arcSize=5;fontColor=#333333;" vertex="1" parent="1">
+      <mxGeometry x="1190" y="140" width="240" height="360" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc24" value="Создать сайт" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1200" y="165" width="215" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc25" value="Настроить виджет" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1200" y="230" width="215" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc26" value="Подключить Telegram-бота" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1200" y="295" width="215" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc27" value="Получить код для вставки" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1200" y="360" width="215" height="45" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc28" value="Настроить рабочие часы и автоответ" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1200" y="425" width="215" height="55" as="geometry" />
+    </mxCell>
+
+    <!-- ======================================================= -->
+    <!-- ГРУППА 7: Управление командой                            -->
+    <!-- ======================================================= -->
+    <mxCell id="g_team" value="Управление командой" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;fontStyle=2;verticalAlign=top;arcSize=5;fontColor=#333333;" vertex="1" parent="1">
+      <mxGeometry x="1190" y="540" width="240" height="300" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc29" value="Зарегистрировать пользователя" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1200" y="565" width="215" height="50" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc30" value="Управлять очередью авто-назначения" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1200" y="635" width="215" height="55" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc31" value="Просмотреть статус менеджеров" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1200" y="710" width="215" height="50" as="geometry" />
+    </mxCell>
+
+    <mxCell id="uc32" value="Создать шаблон ответа" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1200" y="780" width="215" height="45" as="geometry" />
+    </mxCell>
+
+    <!-- ======================================================= -->
+    <!-- СВЯЗИ АКТОРОВ С ПРЕЦЕДЕНТАМИ                             -->
+    <!-- ======================================================= -->
+
+    <!-- Клиент (a1) -->
+    <mxCell id="e101" style="endArrow=none;html=1;" edge="1" source="a1" target="uc03" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e102" style="endArrow=none;html=1;" edge="1" source="a1" target="uc04" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e103" style="endArrow=none;html=1;" edge="1" source="a1" target="uc05" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e104" style="endArrow=none;html=1;" edge="1" source="a1" target="uc06" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e105" style="endArrow=none;html=1;" edge="1" source="a1" target="uc07" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+    <!-- Telegram-пользователь (a2) -->
+    <mxCell id="e201" style="endArrow=none;html=1;" edge="1" source="a2" target="uc08" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e202" style="endArrow=none;html=1;" edge="1" source="a2" target="uc07" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+    <!-- Менеджер (a3) — только свои (РОП и Адм наследуют) -->
+    <mxCell id="e301" style="endArrow=none;html=1;" edge="1" source="a3" target="uc01" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e302" style="endArrow=none;html=1;" edge="1" source="a3" target="uc10" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e303" style="endArrow=none;html=1;" edge="1" source="a3" target="uc11" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e304" style="endArrow=none;html=1;" edge="1" source="a3" target="uc14" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+    <!-- РОП (a4) -->
+    <mxCell id="e401" style="endArrow=none;html=1;" edge="1" source="a4" target="uc15" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e402" style="endArrow=none;html=1;" edge="1" source="a4" target="uc16" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e403" style="endArrow=none;html=1;" edge="1" source="a4" target="uc17" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e404" style="endArrow=none;html=1;" edge="1" source="a4" target="uc18" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e405" style="endArrow=none;html=1;" edge="1" source="a4" target="uc21" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e406" style="endArrow=none;html=1;" edge="1" source="a4" target="uc22" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e407" style="endArrow=none;html=1;" edge="1" source="a4" target="uc23" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e408" style="endArrow=none;html=1;" edge="1" source="a4" target="uc31" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e409" style="endArrow=none;html=1;" edge="1" source="a4" target="uc32" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+    <!-- Администратор (a5) -->
+    <mxCell id="e501" style="endArrow=none;html=1;" edge="1" source="a5" target="uc24" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e502" style="endArrow=none;html=1;" edge="1" source="a5" target="uc25" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e503" style="endArrow=none;html=1;" edge="1" source="a5" target="uc26" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e504" style="endArrow=none;html=1;" edge="1" source="a5" target="uc27" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e505" style="endArrow=none;html=1;" edge="1" source="a5" target="uc28" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e506" style="endArrow=none;html=1;" edge="1" source="a5" target="uc29" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e507" style="endArrow=none;html=1;" edge="1" source="a5" target="uc30" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e508" style="endArrow=none;html=1;" edge="1" source="a5" target="uc02" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+    <!-- ======================================================= -->
+    <!-- ОТНОШЕНИЯ INCLUDE / EXTEND                                -->
+    <!-- ======================================================= -->
+
+    <!-- «extend»: Прикрепить файл EXTEND Отправить сообщение (клиент) -->
+    <mxCell id="r01" value="«extend»" style="endArrow=open;html=1;dashed=1;fontSize=10;endFill=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="uc06" target="uc05" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- «extend»: Прикрепить файл к ответу EXTEND Ответить клиенту -->
+    <mxCell id="r02" value="«extend»" style="endArrow=open;html=1;dashed=1;fontSize=10;endFill=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" source="uc12" target="uc11" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- «extend»: Использовать шаблон EXTEND Ответить клиенту -->
+    <mxCell id="r03" value="«extend»" style="endArrow=open;html=1;dashed=1;fontSize=10;endFill=0;" edge="1" source="uc13" target="uc11" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- «include»: Экспорт PDF INCLUDE Просмотреть статистику -->
+    <mxCell id="r04" value="«include»" style="endArrow=open;html=1;dashed=1;fontSize=10;endFill=0;" edge="1" source="uc23" target="uc21" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- «include»: Закрыть чат INCLUDE Запросить оценку -->
+    <mxCell id="r05" value="«include»" style="endArrow=open;html=1;dashed=1;fontSize=10;endFill=0;" edge="1" source="uc17" target="uc20" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- «extend»: Получить автоответ EXTEND Написать через Telegram -->
+    <mxCell id="r06" value="«extend»" style="endArrow=open;html=1;dashed=1;fontSize=10;endFill=0;" edge="1" source="uc09" target="uc08" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- «include»: Авто-назначить INCLUDE при создании нового чата -->
+    <mxCell id="r07" value="«include»" style="endArrow=open;html=1;dashed=1;fontSize=10;endFill=0;" edge="1" source="uc04" target="uc19" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+  </root>
+</mxGraphModel>

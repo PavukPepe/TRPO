@@ -1,0 +1,182 @@
+```mermaid
+%% Backend class diagrams for documentation
+%% Level 1: основные модели БД (только имена)
+classDiagram
+direction LR
+class AuditLog
+class Brand
+class BrandSalesAnalyticsView
+class DeliveredOrder
+class Material
+class Order
+class OrderDetail
+class OrderStatus
+class PasswordResetToken
+class PaymentStatus
+class PendingRegistration
+class Product
+class ProductInventoryView
+class Role
+class TelegramVerificationToken
+class User
+class UserOrdersSummaryView
+class UserPreference
+
+%% Level 2: перечень моделей и API-классов (без полей и методов)
+classDiagram
+class Chat
+class Message
+direction LR
+%% Доменные модели
+
+class Chat
+class Message
+class AuditLog
+class Brand
+class BrandSalesAnalyticsView
+class DeliveredOrder
+class ChatConsumer
+class NotificationConsumer
+class Material
+class Order
+class OrderDetail
+class OrderStatus
+class PasswordResetToken
+class Chat {
+  +Id : long
+  +ClientId : long
+  +AssignedManagerId : long?
+  +Status : string
+  +CreatedAt : DateTime
+  +UpdatedAt : DateTime
+}
+class Message {
+  +Id : long
+  +ChatId : long
+  +SenderType : string
+  +SenderId : long
+  +Content : string
+  +Timestamp : DateTime
+}
+class PaymentStatus
+class PendingRegistration
+class Product
+class ProductInventoryView
+class Role
+class TelegramVerificationToken
+class User
+class UserOrdersSummaryView
+class UserPreference
+
+%% Инфраструктура и сервисы
+class AppDbContext
+class Program
+class ExceptionMiddleware
+class ShopMetrics
+class ShopMetricsCollector
+class IDatabaseDumpService
+class DatabaseDumpService
+class DatabaseDumpOptions
+class ITelegramMessenger
+class TelegramMessenger
+class TelegramOptions
+class RegistrationOptions
+
+%% Контроллеры
+class AnalyticsController
+class BrandController
+class DatabaseController
+class DeliveredOrderController
+class MaterialController
+class OrderController
+class OrderDetailController
+class OrderStatusController
+class PaymentStatusController
+class ProductController
+class RegistrationController
+class RoleController
+class TelegramVerificationController
+class UserController
+class UserPreferencesController
+class PasswordResetController
+
+%% DTOs
+class AnalyticsDashboardDto
+class AnalyticsRecentOrderDto
+class AnalyticsLowStockProductDto
+class SalesByBrandDto
+class RevenueTrendPointDto
+class BrandRevenueDto
+class BrandDto
+class BrandCreateDto
+class MaterialDto
+class MaterialCreateDto
+class ProductListItemDto
+class ProductBrandDto
+class ProductUpdateDto
+class ProductCreateDto
+class OrderDto
+class OrderCreateDto
+class OrderStatusUpdateDto
+class OrderSummaryDto
+class OrderItemDto
+class OrderDetailsDto
+class DeliveredOrderSummaryDto
+class DeliveredOrderDto
+class CheckoutItemDto
+class CreateOrderRequestDto
+class CheckoutResultDto
+class UserDto
+class UserCreateDto
+class UserUpdateDto
+class RoleDto
+class RegistrationRequestDto
+class RegistrationRequestResponseDto
+class RegistrationConfirmDto
+class RegistrationBotStartDto
+class RegistrationResendDto
+class TelegramVerificationRequestDto
+class TelegramVerificationByLoginRequestDto
+class TelegramVerificationConfirmDto
+class UserPreferenceDto
+class PasswordResetRequestDto
+class PasswordResetCompleteDto
+
+%% Level 3: поля (без методов, без связей)
+classDiagram
+direction TB
+
+%% Доменные модели
+class AuditLog {
+  +Id : long
+  +UserId : long
+  +OperationTime : DateTime
+  +TableName : string
+  +OldData : string
+  +NewData : string
+}
+class Brand {
+  +Id : long
+  +Name : string
+  +IsDeleted : bool
+  +CreatedAt : DateTime
+}
+class BrandSalesAnalyticsView {
+  +BrandId : long
+  +BrandName : string
+  +TotalOrders : int
+  +DeliveredOrders : int
+  +TotalUnits : int
+  +TotalRevenue : decimal
+  +AvgOrderValue : decimal
+}
+class DeliveredOrder {
+  +OrderId : long
+  +DeliveryDate : DateTime
+  +CourierName : string
+}
+
+%% Примечание
+%% Если нужно — могу расширить Level 3, добавив поля для остальных моделей и DTOs или показать связи между классами.
+
+```

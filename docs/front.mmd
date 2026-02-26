@@ -1,0 +1,122 @@
+%% Frontend class/structure diagrams — multi-level (в стиле back.mmd)
+
+%% Level 1: основные компоненты/страницы (только имена)
+classDiagram
+direction LR
+class App
+class Layout
+class GlobalsCss
+class Providers
+class Routes
+class DashboardPage
+class OrdersPage
+class BrandsPage
+class MaterialsPage
+class ProductsPage
+class UsersPage
+class OrderStatusesPage
+class PaymentStatusesPage
+class DeliveredOrdersPage
+class AnalyticsPage
+class DatabaseBackupPage
+class LoginPage
+class LogoutSyncPage
+class Entities
+class Features
+class Widgets
+class Shared
+
+%% Level 2: перечень компонентов/контекстов/хуков/утилит (без полей и методов)
+classDiagram
+direction LR
+%% Компоненты
+class App
+class AppHeader
+class AppSidebar
+class AuthGuard
+class ChatCard
+class ChatDetail
+class ChatsList
+class KanbanBoard
+class KanbanColumn
+class NotificationProvider
+class ThemeProvider
+class StatsPdfReport
+class UI
+
+%% Контексты / Провайдеры
+class AuthContext
+class ThemeContext
+class NotificationContext
+
+%% Хуки
+class useMobile
+class useRoleGuard
+class useToast
+
+%% Библиотеки / API / Утилиты
+class Adapters
+class ApiClient
+class MockData
+class PdfExport
+class Utils
+
+%% Level 3: поля/props (без методов, без связей) — ключевые элементы
+classDiagram
+direction TB
+
+class Layout {
+  +children : ReactNode
+  +metadata : object
+  +headerVisible : bool
+  +sidebarCollapsed : bool
+}
+class AuthGuard {
+  +children : ReactNode
+  +allowedRoles : string[]
+  +redirectTo : string
+  +loading : bool
+}
+class AppHeader {
+  +user : User | null
+  +onToggleSidebar() : void
+  +notificationsCount : int
+}
+class AppSidebar {
+  +items : MenuItem[]
+  +collapsed : bool
+  +activeRoute : string
+}
+class NotificationProvider {
+  +notifications : Notification[]
+  +addNotification() : void
+  +removeNotification() : void
+}
+class ThemeProvider {
+  +theme : "light"|"dark"
+  +toggleTheme() : void
+}
+class DashboardPage {
+  +topCardsData : object
+  +recentOrders : Order[]
+  +chartsData : object
+}
+class OrdersPage {
+  +filters : object
+  +orders : Order[]
+  +loading : bool
+}
+class ApiClient {
+  +get(url:string, params?:object) : Promise<any>
+  +post(url:string, body?:object) : Promise<any>
+}
+class useMobile {
+  +isMobile : bool
+}
+class useToast {
+  +showToast(message:string, type?:string) : void
+}
+
+%% Примечание
+%% Файл можно расширить: добавить поля для всех страниц/компонентов, показать связи (props -> DTOs),
+%% либо экспортировать диаграмму в SVG/PNG для отчёта.

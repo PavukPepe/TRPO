@@ -1,0 +1,81 @@
+```mermaid
+graph TD
+    %% Frontend and user flows
+    Browser["User Browser / Admin UI"] -->|HTTP\/S API| Frontend["Frontend (Next.js)"]
+    Frontend -->|REST API| API["Backend API (Django / DRF)"]
+    Frontend -->|WebSocket| WS["WebSockets (Channels)"]
+    Browser -->|Auth JWT| Auth["Auth Service / JWT"]
+
+    %% Backend infra
+    API --> DB[(Postgres DB)]
+    API --> Cache[(Redis cache & sessions)]
+    API --> Files["Media / Static Storage"]
+    API --> Celery["Celery workers"]
+    Celery --> DB
+    Celery --> Files
+    Celery -->|enqueue| Tasks["Background tasks: emails, reports, exports"]
+
+    %% Real-time & bots
+    WS --> Chats["Realtime chats consumers"]
+    API --> Telegram["Telegram Bot / Messenger"]
+    Telegram -->|push\/receive| API
+
+    %% Functional domains
+    API --> UsersSvc["Users Service"]
+    API --> RolesSvc["Roles & Permissions"]
+    API --> CatalogSvc["Catalog: Brands / Materials / Products"]
+    CatalogSvc --> Inventory["Inventory & Stock views"]
+    API --> OrdersSvc["Orders & Delivery"]
+    OrdersSvc --> Delivery["Delivery scheduling"]
+    OrdersSvc --> Payments["Payment processing"]
+    API --> AnalyticsSvc["Analytics / Reports / Views"]
+    API --> BackupSvc["Database backup/restore"]
+    API --> AuditSvc["Audit log / Activity"]
+    API --> WidgetSvc["Widget endpoint (public)"]
+    API --> SitesSvc["Public sites management"]
+    API --> StatsSvc["Stats endpoints"]
+    API --> ChatsSvc["Chat APIs"]
+
+    %% CI / Preview
+    GitLabCI["CI / GitLab pipeline"] -->|build| Image["Docker image / artifacts"]
+    Image -->|deploy| Review["Review App / Preview URL"]
+    Review --> Frontend
+    Review --> API
+
+    %% External integrations
+    API --> SMTP["SMTP / Email"]
+    API --> StorageS3["S3 or Object Storage"]
+    API --> Prometheus["Metrics / Monitoring"]
+
+    %% UX-level flows (map to UI features)
+    UsersSvc -->|CRUD| Frontend
+    CatalogSvc -->|CRUD & Inventory| Frontend
+    OrdersSvc -->|place\/update| Frontend
+    AnalyticsSvc -->|dashboard data| Frontend
+    BackupSvc -->|admin action| Frontend
+    AuditSvc -->|view| Frontend
+    WidgetSvc -->|public JS| Website["Third-party websites"]
+    Website --> WidgetSvc
+
+    %% Styles
+    style Browser fill:#e3f2fd
+    style Frontend fill:#c8e6c9
+    style API fill:#ffe0b2
+    style DB fill:#fff3e0
+    style Cache fill:#f0f4c3
+    style Celery fill:#ffe0b2
+    style WS fill:#f3e5f5
+    style Telegram fill:#e8f5e9
+    style Review fill:#ffecb3
+    style Image fill:#d1c4e9
+    style Tasks fill:#f8bbd0
+    style Files fill:#ffecb3
+    style GitLabCI fill:#c5cae9
+    style Prometheus fill:#c5cae9
+    style Website fill:#e1f5ff
+
+    %% Notes
+    click Frontend "./docs/frontend_graph.mmd" "Open frontend structure"
+    click API "./docs/backend_graph.mmd" "Open backend structure"
+
+```
