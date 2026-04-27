@@ -13,7 +13,6 @@ def test_message_create_auto_assign_and_file_save(db, django_user_model, monkeyp
 
     chat = Chat.objects.create(site=site)
 
-    # prepare request with a file and authenticated user
     f = SimpleUploadedFile('img.png', b'PNGDATA', content_type='image/png')
     req = factory.post(f'/api/chats/{chat.id}/messages/', {'content': 'reply', 'files': [f]}, format='multipart')
     req.user = manager
@@ -23,7 +22,6 @@ def test_message_create_auto_assign_and_file_save(db, django_user_model, monkeyp
     resp = view(req, chat_id=chat.id)
     assert resp.status_code == 201
 
-    # message should be created and chat assigned
     assert Message.objects.filter(chat=chat).exists()
     chat.refresh_from_db()
     assert chat.assigned_manager_id == manager.id
