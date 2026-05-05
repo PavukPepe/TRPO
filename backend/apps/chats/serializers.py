@@ -1,9 +1,24 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from .models import Chat, File, ManagerQueue, ManagerStatus, Message, Rating, Template
+from .models import Chat, Contact, File, ManagerQueue, ManagerStatus, Message, Rating, Template
 
 User = get_user_model()
+
+
+# --- Contact ---
+
+class ContactSerializer(serializers.ModelSerializer):
+    chats_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Contact
+        fields = ('id', 'site', 'name', 'email', 'phone', 'telegram_username',
+                  'notes', 'chats_count', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'created_at', 'updated_at')
+
+    def get_chats_count(self, obj):
+        return obj.chats.count()
 
 
 # --- Chat ---

@@ -11,6 +11,7 @@ from django.conf import settings
 from apps.chats.models import Chat, Message
 from apps.chats.services import notify_new_chat, notify_new_message
 from apps.chats.tasks import assign_chat_to_next_manager
+from apps.chats.views import _link_contact
 from apps.sites.models import Site
 
 from .models import TelegramUser
@@ -91,6 +92,7 @@ def _create_chat(site: Site, tg_user: TelegramUser, telegram_chat_id: int) -> Ch
         channel=Chat.Channel.TELEGRAM,
         status=Chat.Status.NEW,
     )
+    _link_contact(chat)
     notify_new_chat(chat)
     assign_chat_to_next_manager.delay(chat.id)
     return chat

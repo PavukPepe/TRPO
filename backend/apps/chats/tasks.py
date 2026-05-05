@@ -1,3 +1,12 @@
+import email as email_lib
+import imaplib
+import smtplib
+import ssl
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.header import decode_header
+from email.utils import parseaddr, make_msgid
+
 from celery import shared_task
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -5,6 +14,167 @@ from django.conf import settings
 from django.utils import timezone
 
 from datetime import timedelta
+
+
+def _decode_header_value(value):
+    """Декодирует заголовок письма в читаемую строку."""
+    if not value:
+        return ''
+    parts = decode_header(value)
+    result = []
+    for part, charset in parts:
+        if isinstance(part, bytes):
+            result.append(part.decode(charset or 'utf-8', errors='replace'))
+        else:
+            result.append(part)
+    return ''.join(result)
+
+
+def _get_email_body(msg):
+    """Извлекает текстовое тело письма."""
+    if msg.is_multipart():
+        for part in msg.walk():
+            ct = part.get_content_type()
+            if ct == 'text/plain':
+                payload = part.get_payload(decode=True)
+                charset = part.get_content_charset() or 'utf-8'
+                return payload.decode(charset, errors='replace')
+    else:
+        payload = msg.get_payload(decode=True)
+        charset = msg.get_content_charset() or 'utf-8'
+        return payload.decode(charset, errors='replace') if payload else ''
+    return ''
+
+
+@shared_task
+def poll_site_email(site_id):
+    """Опрашивает IMAP ящик одного сайта и создаёт чаты/сообщения из новых писем."""
+    from .models import Chat, Contact, Message
+    from apps.sites.models import Site
+    from .services import notify_new_chat, notify_new_message
+    from .tasks import assign_chat_to_next_manager
+
+    try:
+        site = Site.objects.get(pk=site_id, email_enabled=True)
+    except Site.DoesNotExist:
+        return
+
+    if not site.email_imap_user or not site.email_imap_password:
+        return
+
+    try:
+        ctx = ssl.create_default_context()
+        imap = imaplib.IMAP4_SSL(site.email_imap_host, site.email_imap_port, ssl_context=ctx)
+        imap.login(site.email_imap_user, site.email_imap_password)
+        imap.select('INBOX')
+
+        # Ищем непрочитанные письма
+        _, data = imap.search(None, 'UNSEEN')
+        uid_list = data[0].split()
+
+        for uid in uid_list:
+            _, msg_data = imap.fetch(uid, '(RFC822)')
+            raw = msg_data[0][1]
+            msg = email_lib.message_from_bytes(raw)
+
+            sender_raw = msg.get('From', '')
+            sender_name, sender_email = parseaddr(sender_raw)
+            sender_name = _decode_header_value(sender_name) or sender_email
+            subject = _decode_header_value(msg.get('Subject', '(без темы)'))
+            message_id = msg.get('Message-ID', '').strip()
+            in_reply_to = msg.get('In-Reply-To', '').strip()
+            references = msg.get('References', '').strip()
+            thread_id = references.split()[0] if references else (in_reply_to or message_id)
+            body = _get_email_body(msg).strip()
+
+            if not sender_email or not body:
+                imap.store(uid, '+FLAGS', '\\Seen')
+                continue
+
+            # Находим или создаём Contact
+            contact, _ = Contact.objects.get_or_create(
+                site=site,
+                email=sender_email.lower(),
+                defaults={'name': sender_name},
+            )
+            if not contact.name and sender_name:
+                contact.name = sender_name
+                contact.save(update_fields=['name'])
+
+            # Ищем существующий открытый чат по thread_id
+            chat = None
+            if thread_id:
+                chat = Chat.objects.filter(
+                    site=site,
+                    channel=Chat.Channel.EMAIL,
+                    email_thread_id=thread_id,
+                ).exclude(status=Chat.Status.CLOSED).first()
+
+            if not chat:
+                chat = Chat.objects.create(
+                    site=site,
+                    contact=contact,
+                    client_name=sender_name,
+                    client_email=sender_email.lower(),
+                    channel=Chat.Channel.EMAIL,
+                    email_subject=subject,
+                    email_thread_id=thread_id or message_id,
+                    email_message_id=message_id,
+                    status=Chat.Status.NEW,
+                )
+                notify_new_chat(chat)
+                assign_chat_to_next_manager.delay(chat.id)
+            else:
+                chat.email_message_id = message_id
+                chat.save(update_fields=['email_message_id', 'updated_at'])
+
+            # Создаём сообщение
+            message = Message.objects.create(
+                chat=chat,
+                sender_type=Message.SenderType.CLIENT,
+                content=body,
+            )
+            notify_new_message(message)
+
+            # Помечаем письмо прочитанным
+            imap.store(uid, '+FLAGS', '\\Seen')
+
+        imap.logout()
+    except Exception:
+        pass  # не роняем Celery при проблемах с IMAP
+
+
+@shared_task
+def poll_all_email_inboxes():
+    """Запускается по расписанию — опрашивает все активные email-сайты."""
+    from apps.sites.models import Site
+    site_ids = list(Site.objects.filter(email_enabled=True).values_list('id', flat=True))
+    for site_id in site_ids:
+        poll_site_email.delay(site_id)
+
+
+def send_email_reply(chat, text):
+    """Отправляет email-ответ менеджера клиенту через SMTP сайта."""
+    site = chat.site
+    if not site.email_imap_user or not site.email_imap_password:
+        raise ValueError('Email не настроен для этого сайта.')
+
+    msg = MIMEMultipart()
+    msg['From'] = site.email_imap_user
+    msg['To'] = chat.client_email
+    msg['Subject'] = f'Re: {chat.email_subject}'
+    msg['Message-ID'] = make_msgid()
+
+    if chat.email_message_id:
+        msg['In-Reply-To'] = chat.email_message_id
+        msg['References'] = chat.email_thread_id or chat.email_message_id
+
+    msg.attach(MIMEText(text, 'plain', 'utf-8'))
+
+    ctx = ssl.create_default_context()
+    with smtplib.SMTP_SSL(site.email_smtp_host, site.email_smtp_port, context=ctx) as smtp:
+        smtp.login(site.email_imap_user, site.email_imap_password)
+        smtp.sendmail(site.email_imap_user, chat.client_email, msg.as_bytes())
 
 
 @shared_task

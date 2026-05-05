@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     ChatViewSet,
+    ContactViewSet,
     HeartbeatView,
     ManagerQueueUpdateView,
     ManagerQueueView,
@@ -17,6 +18,9 @@ router.register('', ChatViewSet, basename='chats')
 
 templates_router = DefaultRouter()
 templates_router.register('', TemplateViewSet, basename='templates')
+
+contacts_router = DefaultRouter()
+contacts_router.register('', ContactViewSet, basename='contacts')
 
 urlpatterns = [
     # Heartbeat (before router to avoid catch-all)

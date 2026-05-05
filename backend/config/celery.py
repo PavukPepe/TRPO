@@ -12,6 +12,10 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'update-manager-statuses': {
         'task': 'apps.chats.tasks.update_manager_statuses',
-        'schedule': 60.0,  # каждые 60 секунд
+        'schedule': 60.0,
+    },
+    'poll-email-inboxes': {
+        'task': 'apps.chats.tasks.poll_all_email_inboxes',
+        'schedule': 60.0,  # каждую минуту
     },
 }

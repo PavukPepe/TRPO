@@ -11,6 +11,7 @@ urlpatterns = [
     path('api/users/', include('apps.users.urls')),
     path('api/sites/', include('apps.sites.urls')),
     path('api/chats/', include('apps.chats.urls')),
+    path('api/contacts/', include('apps.chats.contacts_urls')),
     path('api/stats/', include('apps.stats.urls')),
     path('api/telegram/', include('apps.telegram.urls')),
     path('api/widget/', include('apps.widget.urls')),

@@ -10,7 +10,32 @@ from rest_framework.response import Response
 
 from apps.users.permissions import IsAdmin, IsManager, IsROP
 
-from .models import Chat, File, ManagerQueue, ManagerStatus, Message, Rating, Template
+from .models import Chat, Contact, File, ManagerQueue, ManagerStatus, Message, Rating, Template
+
+
+def _link_contact(chat):
+    """Находит или создаёт Contact и привязывает его к чату."""
+    if not chat.client_email and not chat.client_name:
+        return
+    lookup = {}
+    if chat.client_email:
+        lookup = {'site': chat.site, 'email': chat.client_email.lower()}
+    else:
+        # Для telegram и виджета без email — по имени (менее надёжно)
+        lookup = {'site': chat.site, 'email': ''}
+    contact, _ = Contact.objects.get_or_create(
+        **lookup,
+        defaults={'name': chat.client_name or ''},
+    )
+    # Обновляем имя если стало известно
+    if chat.client_name and not contact.name:
+        contact.name = chat.client_name
+        contact.save(update_fields=['name'])
+    if chat.telegram_username and not contact.telegram_username:
+        contact.telegram_username = chat.telegram_username
+        contact.save(update_fields=['telegram_username'])
+    chat.contact = contact
+    chat.save(update_fields=['contact'])
 
 ALLOWED_MIME_TYPES = frozenset({
     'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf',
@@ -22,6 +47,7 @@ from .serializers import (
     ChatListSerializer,
     ChatMergeSerializer,
     ChatStatusSerializer,
+    ContactSerializer,
     ManagerQueueSerializer,
     ManagerStatusSerializer,
     MessageCreateSerializer,
@@ -35,9 +61,25 @@ from .services import (
     notify_new_chat,
     notify_new_message,
 )
-from .tasks import assign_chat_to_next_manager
+from .tasks import assign_chat_to_next_manager, send_email_reply
 
 User = get_user_model()
+
+
+class ContactViewSet(viewsets.ModelViewSet):
+    serializer_class = ContactSerializer
+    permission_classes = [IsAuthenticated, IsManager]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['site']
+    search_fields = ['name', 'email', 'phone', 'telegram_username']
+    ordering_fields = ['created_at', 'updated_at']
+
+    def get_queryset(self):
+        user = self.request.user
+        org_name = user.organization_name
+        if org_name:
+            return Contact.objects.filter(site__owner__organization_name=org_name)
+        return Contact.objects.filter(site__owner=user)
 
 
 class ChatViewSet(viewsets.ModelViewSet):
@@ -56,6 +98,7 @@ class ChatViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         chat = serializer.save()
+        _link_contact(chat)
         notify_new_chat(chat)
         assign_chat_to_next_manager.delay(chat.id)
 
@@ -179,10 +222,17 @@ class MessageListCreateView(generics.ListCreateAPIView):
 
         notify_new_message(message)
 
-        # Пересылка в Telegram, если чат из Telegram-канала
+        # Пересылка в Telegram
         if chat.channel == Chat.Channel.TELEGRAM and chat.telegram_chat_id:
             from apps.telegram.tasks import send_telegram_reply
             send_telegram_reply.delay(chat.id, message.content)
+
+        # Отправка email-ответа клиенту
+        if chat.channel == Chat.Channel.EMAIL and chat.client_email and message.content:
+            try:
+                send_email_reply(chat, message.content)
+            except Exception:
+                pass  # не ломаем ответ если SMTP недоступен
 
         return Response(
             MessageSerializer(message, context={'request': request}).data,

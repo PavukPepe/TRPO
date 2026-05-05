@@ -3,6 +3,32 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
+class Contact(models.Model):
+    """Контакт — уникальный человек, к которому привязаны все лиды (чаты)."""
+    site = models.ForeignKey(
+        'sites.Site',
+        on_delete=models.CASCADE,
+        related_name='contacts',
+        verbose_name='Сайт',
+    )
+    name = models.CharField('Имя', max_length=255, blank=True)
+    email = models.EmailField('Email', blank=True, db_index=True)
+    phone = models.CharField('Телефон', max_length=50, blank=True)
+    telegram_username = models.CharField('Telegram', max_length=255, blank=True)
+    notes = models.TextField('Заметки', blank=True)
+    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
+    updated_at = models.DateTimeField('Обновлён', auto_now=True)
+
+    class Meta:
+        verbose_name = 'Контакт'
+        verbose_name_plural = 'Контакты'
+        ordering = ['-updated_at']
+        unique_together = [('site', 'email')]
+
+    def __str__(self):
+        return self.name or self.email or f'Контакт #{self.pk}'
+
+
 class Chat(models.Model):
     class Status(models.TextChoices):
         NEW = 'new', 'Новая'
@@ -13,6 +39,7 @@ class Chat(models.Model):
     class Channel(models.TextChoices):
         WIDGET = 'widget', 'Виджет'
         TELEGRAM = 'telegram', 'Telegram'
+        EMAIL = 'email', 'Email'
 
     site = models.ForeignKey(
         'sites.Site',
@@ -20,9 +47,23 @@ class Chat(models.Model):
         related_name='chats',
         verbose_name='Сайт',
     )
+    contact = models.ForeignKey(
+        Contact,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='chats',
+        verbose_name='Контакт',
+    )
     client_name = models.CharField('Имя клиента', max_length=255, blank=True)
     client_email = models.EmailField('Email клиента', blank=True)
     telegram_username = models.CharField('Telegram никнейм', max_length=255, blank=True)
+
+    # Email threading fields
+    email_subject = models.CharField('Тема письма', max_length=500, blank=True)
+    email_thread_id = models.CharField('Thread-ID', max_length=500, blank=True, db_index=True)
+    email_message_id = models.CharField('Message-ID последнего письма', max_length=500, blank=True)
+
     assigned_manager = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

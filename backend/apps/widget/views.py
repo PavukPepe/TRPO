@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.chats.models import Chat, File, Message
+from apps.chats.views import _link_contact
 from apps.sites.models import Site
 from django.utils import timezone
 
@@ -165,10 +166,11 @@ class WidgetChatView(APIView):
         chat = Chat.objects.create(
             site=site,
             client_name=serializer.validated_data.get('client_name', ''),
-            client_email=actual_email or session_id,  # Предпочитаем реальный email
+            client_email=actual_email or session_id,
             channel=Chat.Channel.WIDGET,
             status=Chat.Status.NEW,
         )
+        _link_contact(chat)
 
         initial_message = serializer.validated_data.get('initial_message', '')
         if initial_message:

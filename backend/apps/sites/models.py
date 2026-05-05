@@ -36,6 +36,16 @@ class Site(models.Model):
         blank=True,
     )
 
+    # Email channel (IMAP + SMTP per site)
+    email_enabled = models.BooleanField('Email-канал включён', default=False)
+    email_imap_host = models.CharField('IMAP хост', max_length=255, blank=True, default='imap.mail.ru')
+    email_imap_port = models.PositiveIntegerField('IMAP порт', default=993)
+    email_imap_user = models.CharField('IMAP логин', max_length=255, blank=True)
+    email_imap_password = models.CharField('IMAP пароль', max_length=255, blank=True)
+    email_smtp_host = models.CharField('SMTP хост', max_length=255, blank=True, default='smtp.mail.ru')
+    email_smtp_port = models.PositiveIntegerField('SMTP порт', default=465)
+    email_last_uid = models.CharField('Последний обработанный UID', max_length=50, blank=True)
+
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
 
     class Meta:
