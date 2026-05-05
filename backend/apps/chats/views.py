@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, status, viewsets
+from rest_framework import generics, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
@@ -13,8 +13,16 @@ from apps.users.permissions import IsAdmin, IsManager, IsROP
 from .models import Chat, Contact, File, ManagerQueue, ManagerStatus, Message, Rating, Template
 
 
-def _link_contact(chat):
-    """Находит или создаёт Contact и привязывает его к чату."""
+def _link_contact(chat, consent_given=False):
+    """Находит или создаёт Contact и привязывает его к чату.
+
+    Если контакт уже существует и у него есть имя, оно становится
+    каноничным для чата — чтобы менеджер видел одно и то же имя клиента
+    независимо от того, что введено в форму.
+
+    consent_given=True — клиент явно согласился на обработку ПДн (ФЗ-152).
+    Время согласия проставляется один раз и больше не перезаписывается.
+    """
     if not chat.client_email and not chat.client_name:
         return
     lookup = {}
@@ -27,15 +35,25 @@ def _link_contact(chat):
         **lookup,
         defaults={'name': chat.client_name or ''},
     )
-    # Обновляем имя если стало известно
+    contact_updates = []
     if chat.client_name and not contact.name:
         contact.name = chat.client_name
-        contact.save(update_fields=['name'])
+        contact_updates.append('name')
     if chat.telegram_username and not contact.telegram_username:
         contact.telegram_username = chat.telegram_username
-        contact.save(update_fields=['telegram_username'])
+        contact_updates.append('telegram_username')
+    if consent_given and not contact.consent_pdn_at:
+        contact.consent_pdn_at = timezone.now()
+        contact_updates.append('consent_pdn_at')
+    if contact_updates:
+        contact.save(update_fields=contact_updates)
+
+    chat_updates = ['contact']
     chat.contact = contact
-    chat.save(update_fields=['contact'])
+    if contact.name and chat.client_name != contact.name:
+        chat.client_name = contact.name
+        chat_updates.append('client_name')
+    chat.save(update_fields=chat_updates)
 
 ALLOWED_MIME_TYPES = frozenset({
     'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf',
@@ -85,7 +103,7 @@ class ContactViewSet(viewsets.ModelViewSet):
 class ChatViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsManager]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['status', 'channel', 'site', 'assigned_manager']
+    filterset_fields = ['status', 'channel', 'site', 'assigned_manager', 'contact']
     search_fields = ['client_name', 'telegram_username', 'messages__content']
     ordering_fields = ['created_at', 'updated_at']
 
@@ -249,16 +267,31 @@ class TemplateViewSet(viewsets.ModelViewSet):
     serializer_class = TemplateSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
+    def _org_sites(self):
+        from apps.sites.models import Site
         user = self.request.user
-        return Template.objects.filter(Q(user=user) | Q(user__isnull=True))
+        if user.organization_name:
+            return Site.objects.filter(owner__organization_name=user.organization_name)
+        return Site.objects.filter(owner=user)
+
+    def get_queryset(self):
+        qs = Template.objects.filter(site__in=self._org_sites())
+        site_id = self.request.query_params.get('site')
+        if site_id:
+            qs = qs.filter(site_id=site_id)
+        return qs
 
     def perform_create(self, serializer):
-        # Только admin может создавать общие шаблоны (user=NULL)
-        if self.request.user.role != 'admin':
-            serializer.save(user=self.request.user)
-        else:
-            serializer.save()
+        site = serializer.validated_data.get('site')
+        if site not in self._org_sites():
+            raise serializers.ValidationError({'site': 'Сайт не принадлежит вашей организации.'})
+        serializer.save()
+
+    def perform_update(self, serializer):
+        site = serializer.validated_data.get('site')
+        if site and site not in self._org_sites():
+            raise serializers.ValidationError({'site': 'Сайт не принадлежит вашей организации.'})
+        serializer.save()
 
 
 class ManagerQueueView(generics.ListCreateAPIView):

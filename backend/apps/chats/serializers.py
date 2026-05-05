@@ -163,7 +163,7 @@ class RatingSerializer(serializers.ModelSerializer):
 class TemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Template
-        fields = ('id', 'user', 'title', 'content', 'hotkey', 'created_at')
+        fields = ('id', 'site', 'title', 'content', 'hotkey', 'created_at')
         read_only_fields = ('id', 'created_at')
 
 

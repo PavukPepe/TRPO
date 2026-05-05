@@ -16,6 +16,14 @@ class WidgetChatCreateSerializer(serializers.Serializer):
     client_name = serializers.CharField(max_length=255, required=False, default='')
     client_email = serializers.EmailField(required=False, default='')
     initial_message = serializers.CharField(required=False, default='')
+    consent = serializers.BooleanField(required=True)
+
+    def validate_consent(self, value):
+        if not value:
+            raise serializers.ValidationError(
+                'Необходимо согласие на обработку персональных данных (ФЗ-152).'
+            )
+        return value
 
 
 class WidgetChatSerializer(serializers.ModelSerializer):

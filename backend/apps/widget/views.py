@@ -111,20 +111,35 @@ class WidgetChatView(APIView):
     authentication_classes = []
 
     def get(self, request, site_uuid):
-        session_id = request.query_params.get('session_id', '')
-        if not session_id:
-            return Response({'detail': 'session_id обязателен.'}, status=status.HTTP_400_BAD_REQUEST)
+        from django.db.models import Q
+
+        session_id = request.query_params.get('session_id', '').strip()
+        email = request.query_params.get('email', '').strip().lower()
+
+        if not session_id and not email:
+            return Response(
+                {'detail': 'session_id или email обязателен.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
             site = Site.objects.get(site_uuid=site_uuid)
         except Site.DoesNotExist:
             return Response({'detail': 'Сайт не найден.'}, status=status.HTTP_404_NOT_FOUND)
 
-        chat = Chat.objects.filter(
-            site=site,
-            channel=Chat.Channel.WIDGET,
-            client_email=session_id,
-        ).exclude(status=Chat.Status.CLOSED).order_by('-updated_at').first()
+        match = Q()
+        if session_id:
+            match |= Q(client_email=session_id)
+        if email:
+            match |= Q(client_email__iexact=email)
+
+        chat = (
+            Chat.objects.filter(site=site, channel=Chat.Channel.WIDGET)
+            .filter(match)
+            .exclude(status=Chat.Status.CLOSED)
+            .order_by('-updated_at')
+            .first()
+        )
 
         if not chat:
             return Response({'detail': 'Чат не найден.'}, status=status.HTTP_404_NOT_FOUND)
@@ -170,7 +185,7 @@ class WidgetChatView(APIView):
             channel=Chat.Channel.WIDGET,
             status=Chat.Status.NEW,
         )
-        _link_contact(chat)
+        _link_contact(chat, consent_given=serializer.validated_data.get('consent', False))
 
         initial_message = serializer.validated_data.get('initial_message', '')
         if initial_message:
@@ -201,6 +216,59 @@ class WidgetChatView(APIView):
             pass
 
         return Response(WidgetChatSerializer(chat).data, status=status.HTTP_201_CREATED)
+
+
+class WidgetChatHistoryView(APIView):
+    """
+    GET /api/widget/{site_uuid}/history/?session_id=xxx&email=yyy
+    Возвращает все ЗАКРЫТЫЕ чаты, привязанные к данной сессии или email —
+    клиент видит свою предыдущую переписку, даже если он сменил браузер
+    или вернулся после очистки cookies (по реальному email).
+    """
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request, site_uuid):
+        from django.db.models import Q
+
+        session_id = request.query_params.get('session_id', '').strip()
+        email = request.query_params.get('email', '').strip().lower()
+
+        if not session_id and not email:
+            return Response({'closed_chats': []})
+
+        try:
+            site = Site.objects.get(site_uuid=site_uuid)
+        except Site.DoesNotExist:
+            return Response({'detail': 'Сайт не найден.'}, status=status.HTTP_404_NOT_FOUND)
+
+        match = Q()
+        if session_id:
+            match |= Q(client_email=session_id)
+        if email:
+            match |= Q(client_email__iexact=email)
+
+        chats = (
+            Chat.objects.filter(
+                site=site,
+                channel=Chat.Channel.WIDGET,
+                status=Chat.Status.CLOSED,
+            )
+            .filter(match)
+            .distinct()
+            .order_by('created_at')
+        )
+
+        result = []
+        for c in chats:
+            result.append({
+                'id': c.id,
+                'closed_at': c.closed_at.isoformat() if c.closed_at else None,
+                'messages': WidgetMessageSerializer(
+                    c.messages.all(), many=True, context={'request': request},
+                ).data,
+            })
+        return Response({'closed_chats': result})
 
 
 class WidgetMessagesView(APIView):

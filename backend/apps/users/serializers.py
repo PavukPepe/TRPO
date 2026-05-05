@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from rest_framework import serializers
 
 from .models import InvitationToken, PLAN_LIMITS
@@ -8,13 +9,23 @@ User = get_user_model()
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
+    consent_pdn = serializers.BooleanField(write_only=True, required=True)
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'first_name', 'last_name', 'organization_name', 'plan')
+        fields = ('email', 'password', 'first_name', 'last_name',
+                  'organization_name', 'plan', 'consent_pdn')
         extra_kwargs = {'plan': {'required': False}}
 
+    def validate_consent_pdn(self, value):
+        if not value:
+            raise serializers.ValidationError(
+                'Необходимо согласие на обработку персональных данных (ФЗ-152).'
+            )
+        return value
+
     def create(self, validated_data):
+        validated_data.pop('consent_pdn', None)
         return User.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password'],
@@ -23,6 +34,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             organization_name=validated_data.get('organization_name', ''),
             plan=validated_data.get('plan', User.Plan.STARTER),
             role=User.Role.ADMIN,
+            consent_pdn_at=timezone.now(),
         )
 
 

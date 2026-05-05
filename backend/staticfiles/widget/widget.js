@@ -17,6 +17,7 @@
   var pollInterval = null;
   var isOpen = false;
   var isMobile = window.innerWidth < 768;
+  var previousChats = [];
   var pendingFiles = [];
 
   // --- Утилиты ---
@@ -182,6 +183,9 @@
   .mch-msg.client{align-self:flex-end;background:' + s.primaryColor + ';color:' + s.textColor + ';border-bottom-right-radius:4px;}\
   .mch-msg.manager,.mch-msg.system{align-self:flex-start;background:#f1f5f9;color:#1e293b;border-bottom-left-radius:4px;}\
   .mch-msg.system{background:#fef3c7;color:#92400e;font-size:13px;}\
+  .mch-divider{display:flex;align-items:center;gap:10px;margin:16px 0 8px;color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.5px;}\
+  .mch-divider::before,.mch-divider::after{content:"";flex:1;height:1px;background:#e2e8f0;}\
+  .mch-quick-hint{padding:10px 16px;text-align:center;color:#64748b;font-size:12px;background:#f8fafc;border-radius:8px;margin:8px 0;}\
   .mch-time{font-size:10px;opacity:.6;margin-top:4px;}\
   .mch-msg-img{max-width:200px;max-height:160px;border-radius:8px;display:block;margin-top:6px;cursor:pointer;}\
   .mch-msg-file{display:flex;align-items:center;gap:6px;margin-top:6px;padding:6px 10px;\
@@ -209,11 +213,15 @@
   .mch-welcome{padding:20px;text-align:center;}\
   .mch-welcome-text{font-size:15px;color:#475569;margin-bottom:16px;}\
   .mch-form{display:flex;flex-direction:column;gap:12px;padding:0 20px 20px;}\
-  .mch-form input{border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;font-size:14px;outline:none;}\
-  .mch-form input:focus{border-color:' + s.primaryColor + ';}\
+  .mch-form input[type=text],.mch-form input[type=email]{border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;font-size:14px;outline:none;}\
+  .mch-form input[type=text]:focus,.mch-form input[type=email]:focus{border-color:' + s.primaryColor + ';}\
+  .mch-consent{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#64748b;line-height:1.4;cursor:pointer;}\
+  .mch-consent input{margin-top:2px;flex-shrink:0;cursor:pointer;}\
+  .mch-consent.mch-consent-error{color:#ef4444;}\
   .mch-form button{background:' + s.primaryColor + ';color:' + s.textColor + ';border:none;border-radius:8px;\
     padding:12px;font-size:14px;font-weight:600;cursor:pointer;}\
   .mch-form button:hover{opacity:.9;}\
+  .mch-form button:disabled{opacity:.5;cursor:not-allowed;}\
 </style>\
 <button class="mch-fab" id="mchFab">\
   <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg>\
@@ -268,6 +276,8 @@
 
     if (chatId) {
       showChatView();
+    } else if (hasSavedProfile()) {
+      showQuickChat(s);
     } else {
       showWelcomeForm(s);
     }
@@ -398,7 +408,9 @@
     footer.style.display = 'none';
     if (strip) strip.style.display = 'none';
 
-    body.innerHTML = '\
+    body.innerHTML = '';
+    renderHistory(body);
+    body.insertAdjacentHTML('beforeend', '\
 <div class="mch-welcome">\
   <div class="mch-welcome-text">' + (s.welcomeMessage || 'Здравствуйте! Чем можем помочь?') + '</div>\
 </div>\
@@ -406,18 +418,31 @@
   <input type="text" id="mchName" placeholder="Ваше имя" />\
   <input type="email" id="mchEmail" placeholder="Email (для продолжения чата)" />\
   <input type="text" id="mchFirstMsg" placeholder="Ваш вопрос..." />\
+  <label class="mch-consent" id="mchConsentLabel">\
+    <input type="checkbox" id="mchConsent" />\
+    <span>Я согласен на обработку персональных данных в соответствии с ФЗ-152.</span>\
+  </label>\
   <button id="mchStartBtn">Начать чат</button>\
-</div>';
+</div>');
+    body.scrollTop = body.scrollHeight;
 
     shadow.getElementById('mchStartBtn').onclick = function () {
       var name = shadow.getElementById('mchName').value.trim();
       var email = shadow.getElementById('mchEmail').value.trim();
       var msg = shadow.getElementById('mchFirstMsg').value.trim();
+      var consent = shadow.getElementById('mchConsent').checked;
+      var consentLabel = shadow.getElementById('mchConsentLabel');
 
       if (!name) {
         shadow.getElementById('mchName').style.borderColor = '#ef4444';
         return;
       }
+
+      if (!consent) {
+        consentLabel.classList.add('mch-consent-error');
+        return;
+      }
+      consentLabel.classList.remove('mch-consent-error');
 
       if (!sessionId) {
         sessionId = generateSessionId();
@@ -428,17 +453,58 @@
         client_name: name,
         client_email: email,
         initial_message: msg,
+        consent: consent,
         session_id: sessionId,
       }).then(function (data) {
         chatId = data.id;
+        lastMessageId = 0;
         localStorage.setItem('mch_chat_' + SITE_UUID, chatId);
-        showChatView();
-        loadMessages();
-        startPolling();
+        if (name) localStorage.setItem('mch_name_' + SITE_UUID, name);
+        if (email) localStorage.setItem('mch_email_' + SITE_UUID, email);
+        // Подгружаем историю по email/session — иначе предыдущая переписка
+        // не попадёт в виджет, если localStorage был очищен или это новое устройство.
+        fetchHistory().then(function () {
+          showChatView();
+          loadMessages();
+          startPolling();
+        });
       }).catch(function (err) {
         console.error('[MultiChat] Ошибка создания чата:', err);
       });
     };
+  }
+
+  // --- Загрузка истории закрытых чатов для текущей сессии ---
+  function fetchHistory() {
+    var savedEmail = localStorage.getItem('mch_email_' + SITE_UUID) || '';
+    var params = [];
+    if (sessionId) params.push('session_id=' + encodeURIComponent(sessionId));
+    if (savedEmail) params.push('email=' + encodeURIComponent(savedEmail));
+    if (!params.length) {
+      previousChats = [];
+      return Promise.resolve();
+    }
+    return api('GET', '/history/?' + params.join('&'))
+      .then(function (data) { previousChats = (data && data.closed_chats) || []; })
+      .catch(function () { previousChats = []; });
+  }
+
+  function renderHistory(body) {
+    if (!previousChats.length) return;
+    previousChats.forEach(function (chat) {
+      (chat.messages || []).forEach(function (m) { appendMessage(body, m); });
+      var divider = document.createElement('div');
+      divider.className = 'mch-divider';
+      var label = 'Чат завершён';
+      if (chat.closed_at) {
+        var d = new Date(chat.closed_at);
+        if (!isNaN(d)) {
+          label = 'Чат завершён ' + d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+        }
+      }
+      divider.textContent = label;
+      body.appendChild(divider);
+    });
   }
 
   // --- Chat view ---
@@ -446,7 +512,34 @@
     var body = shadow.getElementById('mchBody');
     var footer = shadow.getElementById('mchFooter');
     body.innerHTML = '';
+    renderHistory(body);
     footer.style.display = 'flex';
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function hasSavedProfile() {
+    return !!(localStorage.getItem('mch_name_' + SITE_UUID)
+      && localStorage.getItem('mch_email_' + SITE_UUID));
+  }
+
+  // Быстрый старт: пользователь уже представлялся раньше — не спрашиваем
+  // имя/email повторно. Показываем историю прошлых чатов и поле ввода.
+  // Чат создастся автоматически в sendMsg при первом сообщении.
+  function showQuickChat(s) {
+    var body = shadow.getElementById('mchBody');
+    var footer = shadow.getElementById('mchFooter');
+    body.innerHTML = '';
+    renderHistory(body);
+
+    var hint = document.createElement('div');
+    hint.className = 'mch-quick-hint';
+    hint.textContent = previousChats.length
+      ? 'Напишите сообщение, чтобы начать новый чат'
+      : (s.welcomeMessage || 'Здравствуйте! Чем можем помочь?');
+    body.appendChild(hint);
+
+    footer.style.display = 'flex';
+    body.scrollTop = body.scrollHeight;
   }
 
   // --- Загрузить сообщения ---
@@ -501,7 +594,51 @@
     var input = shadow.getElementById('mchInput');
     var text = input ? input.value.trim() : '';
     if (!text && !pendingFiles.length) return;
-    if (!chatId) return;
+
+    // Quick-start: chatId ещё нет, но в localStorage уже есть данные клиента —
+    // создаём чат прозрачно, без повторного запроса имени/email.
+    if (!chatId) {
+      if (!hasSavedProfile()) return;
+      var savedName = localStorage.getItem('mch_name_' + SITE_UUID);
+      var savedEmail = localStorage.getItem('mch_email_' + SITE_UUID);
+      var pendingFromQuick = pendingFiles.slice();
+      pendingFiles = [];
+      renderFileStrip();
+      if (input) input.value = '';
+      api('POST', '/chat/', {
+        client_name: savedName,
+        client_email: savedEmail,
+        initial_message: text,
+        consent: true,
+        session_id: sessionId,
+      }).then(function (data) {
+        chatId = data.id;
+        lastMessageId = 0;
+        localStorage.setItem('mch_chat_' + SITE_UUID, chatId);
+        return fetchHistory().then(function () {
+          showChatView();
+          loadMessages();
+          startPolling();
+          // Если были вложения — досылаем их отдельным сообщением.
+          if (pendingFromQuick.length) {
+            var form = new FormData();
+            pendingFromQuick.forEach(function (f) { form.append('files', f); });
+            apiFormData('/chat/' + chatId + '/messages/', form)
+              .then(function (msg) {
+                if (msg.id > lastMessageId) lastMessageId = msg.id;
+                var body = shadow.getElementById('mchBody');
+                appendMessage(body, msg);
+                body.scrollTop = body.scrollHeight;
+              })
+              .catch(handleSendError);
+          }
+        });
+      }).catch(function (err) {
+        console.error('[MultiChat] Ошибка создания чата:', err);
+      });
+      return;
+    }
+
     if (input) input.value = '';
 
     var filesToSend = pendingFiles.slice();
@@ -528,22 +665,30 @@
       apiFormData('/chat/' + chatId + '/messages/', form)
         .then(function (msg) {
           if (msg.id > lastMessageId) lastMessageId = msg.id;
-          // Refresh to show files
           var body = shadow.getElementById('mchBody');
           appendMessage(body, msg);
           body.scrollTop = body.scrollHeight;
         })
-        .catch(function (err) {
-          console.error('[MultiChat] Ошибка отправки файла:', err);
-        });
+        .catch(handleSendError);
     } else {
       api('POST', '/chat/' + chatId + '/messages/', { content: text })
         .then(function (msg) {
           if (msg.id > lastMessageId) lastMessageId = msg.id;
         })
-        .catch(function (err) {
-          console.error('[MultiChat] Ошибка отправки:', err);
-        });
+        .catch(handleSendError);
+    }
+  }
+
+  function handleSendError(err) {
+    console.error('[MultiChat] Ошибка отправки:', err);
+    // Менеджер закрыл чат — переводим клиента на форму создания нового чата,
+    // предыдущая переписка покажется как история.
+    if (err && err.message && err.message.indexOf('400') !== -1) {
+      stopPolling();
+      chatId = null;
+      lastMessageId = 0;
+      localStorage.removeItem('mch_chat_' + SITE_UUID);
+      fetchHistory().then(render);
     }
   }
 
@@ -597,6 +742,13 @@
       badge.style.display = 'none';
       badge.textContent = '0';
     }
+    // Скроллим к последним сообщениям — пользователь должен видеть актуальное.
+    var body = shadow.getElementById('mchBody');
+    if (body) {
+      requestAnimationFrame(function () {
+        body.scrollTop = body.scrollHeight;
+      });
+    }
   }
 
   function closeChat() {
@@ -612,16 +764,33 @@
 
   // --- Восстановление сессии ---
   function restoreSession() {
-    var savedChat = localStorage.getItem('mch_chat_' + SITE_UUID);
-    if (savedChat && sessionId) {
-      chatId = parseInt(savedChat);
+    var savedEmail = localStorage.getItem('mch_email_' + SITE_UUID) || '';
+    if (!sessionId && !savedEmail) {
       render();
-      showChatView();
-      loadMessages();
-      startPolling();
-    } else {
-      render();
+      return;
     }
+    // Ищем активный чат по session_id и/или email — потому что при создании
+    // чата в client_email сохраняется реальный email, а не session_id.
+    var params = [];
+    if (sessionId) params.push('session_id=' + encodeURIComponent(sessionId));
+    if (savedEmail) params.push('email=' + encodeURIComponent(savedEmail));
+    api('GET', '/chat/?' + params.join('&'))
+      .then(function (chat) {
+        chatId = chat.id;
+        localStorage.setItem('mch_chat_' + SITE_UUID, chatId);
+        return fetchHistory().then(function () {
+          render();
+          loadMessages();
+          startPolling();
+        });
+      })
+      .catch(function () {
+        // Нет активного чата (404) — забываем сохранённый id и подгружаем историю.
+        chatId = null;
+        lastMessageId = 0;
+        localStorage.removeItem('mch_chat_' + SITE_UUID);
+        fetchHistory().then(render);
+      });
   }
 
   // --- Очистка при закрытии страницы ---

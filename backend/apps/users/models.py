@@ -74,6 +74,9 @@ class User(AbstractUser):
     role = models.CharField('Роль', max_length=10, choices=Role.choices, default=Role.MANAGER)
     plan = models.CharField('Тариф', max_length=20, choices=Plan.choices, default=Plan.STARTER)
     organization_name = models.CharField('Название организации', max_length=255, blank=True)
+    consent_pdn_at = models.DateTimeField(
+        'Согласие на обработку ПДн (ФЗ-152)', null=True, blank=True,
+    )
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
 
     objects = UserManager()

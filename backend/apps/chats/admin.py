@@ -40,8 +40,8 @@ class RatingAdmin(admin.ModelAdmin):
 
 @admin.register(Template)
 class TemplateAdmin(admin.ModelAdmin):
-    list_display = ('title', 'user', 'hotkey', 'created_at')
-    list_filter = ('user',)
+    list_display = ('title', 'site', 'hotkey', 'created_at')
+    list_filter = ('site',)
 
 
 @admin.register(ManagerQueue)

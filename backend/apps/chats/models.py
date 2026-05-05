@@ -16,6 +16,9 @@ class Contact(models.Model):
     phone = models.CharField('Телефон', max_length=50, blank=True)
     telegram_username = models.CharField('Telegram', max_length=255, blank=True)
     notes = models.TextField('Заметки', blank=True)
+    consent_pdn_at = models.DateTimeField(
+        'Согласие на обработку ПДн (ФЗ-152)', null=True, blank=True,
+    )
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Обновлён', auto_now=True)
 
@@ -190,14 +193,11 @@ class Rating(models.Model):
 
 
 class Template(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+    site = models.ForeignKey(
+        'sites.Site',
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
         related_name='templates',
-        verbose_name='Пользователь',
-        help_text='NULL = общий шаблон для всех',
+        verbose_name='Сайт',
     )
     title = models.CharField('Название', max_length=255)
     content = models.TextField('Содержание')
