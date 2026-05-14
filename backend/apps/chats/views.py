@@ -167,11 +167,6 @@ class ChatViewSet(viewsets.ModelViewSet):
         chat.save()
         notify_chat_status_changed(chat)
 
-        # Запрос оценки в Telegram при закрытии
-        if new_status == Chat.Status.CLOSED and chat.channel == Chat.Channel.TELEGRAM and chat.telegram_chat_id:
-            from apps.telegram.tasks import send_rating_request
-            send_rating_request.delay(chat.id)
-
         return Response(ChatDetailSerializer(chat).data)
 
     @action(detail=True, methods=['post'], url_path='merge')
@@ -239,11 +234,6 @@ class MessageListCreateView(generics.ListCreateAPIView):
                 )
 
         notify_new_message(message)
-
-        # Пересылка в Telegram
-        if chat.channel == Chat.Channel.TELEGRAM and chat.telegram_chat_id:
-            from apps.telegram.tasks import send_telegram_reply
-            send_telegram_reply.delay(chat.id, message.content)
 
         # Отправка email-ответа клиенту
         if chat.channel == Chat.Channel.EMAIL and chat.client_email and message.content:

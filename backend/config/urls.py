@@ -13,7 +13,6 @@ urlpatterns = [
     path('api/chats/', include('apps.chats.urls')),
     path('api/contacts/', include('apps.chats.contacts_urls')),
     path('api/stats/', include('apps.stats.urls')),
-    path('api/telegram/', include('apps.telegram.urls')),
     path('api/widget/', include('apps.widget.urls')),
     # Swagger
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

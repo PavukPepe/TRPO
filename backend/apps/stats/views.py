@@ -87,10 +87,6 @@ def _filter_ratings_by_date(qs, date_from, date_to):
 
 
 def _calculate_avg_first_response(chat_ids):
-    """Среднее время (сек) от первого сообщения клиента до первого ответа менеджера.
-
-    Выбросы > 24 ч отбрасываются. Возвращает int либо None, если данных нет.
-    """
     if not chat_ids:
         return None
 

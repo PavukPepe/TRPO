@@ -13,6 +13,21 @@ DEBUG = os.getenv('DEBUG', '0') == '1'
 _allowed_hosts_raw = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1')
 ALLOWED_HOSTS = ['*'] if _allowed_hosts_raw == '*' else _allowed_hosts_raw.split(',')
 
+# Доверенные origin-ы для CSRF (нужны для админки за обратным прокси)
+CSRF_TRUSTED_ORIGINS = [
+    o.strip() for o in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()
+]
+
+# За nginx: считать X-Forwarded-* заголовки, не запутаться в HTTPS
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Security headers (включаются только если DEBUG=0)
+if not DEBUG:
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_REFERRER_POLICY = 'same-origin'
+    X_FRAME_OPTIONS = 'DENY'
+
 INSTALLED_APPS = [
     'daphne',
     'django.contrib.admin',
@@ -32,7 +47,6 @@ INSTALLED_APPS = [
     'apps.users',
     'apps.sites',
     'apps.chats',
-    'apps.telegram',
     'apps.widget',
 ]
 
@@ -179,9 +193,6 @@ MANAGER_OFFLINE_THRESHOLD = 600    # 10 минут без активности =
 # File upload limits
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
-
-# Telegram
-TELEGRAM_WEBHOOK_BASE_URL = os.environ.get('TELEGRAM_WEBHOOK_BASE_URL', '')
 
 # Email (system — for invites & password reset)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

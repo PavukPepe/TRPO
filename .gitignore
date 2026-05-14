@@ -1,0 +1,42 @@
+# macOS
+.DS_Store
+
+# Word lock files
+~$*.docx
+~$*.doc
+
+# Editors
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Django
+db.sqlite3
+backend/staticfiles/
+backend/media/
+backend/.env
+backend/*.log
+
+# Node
+node_modules/
+.next/
+*.tsbuildinfo
+
+# Env
+.env
+.env.local
+.env.*.local
+.env.prod
+.env.production
+deploy/.env.prod
+
+# Не блокируем шаблоны
+!.env.example
+!.env.prod.example
+!.env.production.example
