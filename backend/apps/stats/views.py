@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth import get_user_model
 from django.db.models import Avg, Count
 from django.db.models.functions import TruncDate
-from django.utils import timezone
+from django.utils.timezone import localdate
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -53,16 +53,22 @@ def _parse_iso_date(value):
 
 
 def _parse_date_range(request):
-    """Парсит date_from и date_to из query params. Всегда возвращает date|None."""
+    """Парсит date_from и date_to из query params. Всегда возвращает date|None.
+
+    Используем localdate() (текущая дата в TIME_ZONE='Europe/Moscow') —
+    это совпадает с тем, как Django раскручивает created_at__date в фильтрах
+    при USE_TZ=True, иначе UTC-дата сервера может расходиться с локальной
+    датой записи на 1 сутки.
+    """
     period = request.query_params.get('period')  # today, week, month
-    now = timezone.now()
+    today = localdate()
 
     if period == 'today':
-        return now.date(), now.date()
+        return today, today
     if period == 'week':
-        return (now - timedelta(days=7)).date(), now.date()
+        return today - timedelta(days=7), today
     if period == 'month':
-        return (now - timedelta(days=30)).date(), now.date()
+        return today - timedelta(days=30), today
 
     return (
         _parse_iso_date(request.query_params.get('date_from')),
@@ -127,7 +133,7 @@ class OverviewStatsView(APIView):
 
     def get(self, request):
         user = request.user
-        today = timezone.now().date()
+        today = localdate()
         date_from, date_to = _parse_date_range(request)
 
         chats_qs = _org_chat_qs(user)
@@ -277,9 +283,9 @@ class ChatsTimelineView(APIView):
         date_from, date_to = _parse_date_range(request)
 
         if not date_from:
-            date_from = (timezone.now() - timedelta(days=30)).date()
+            date_from = localdate() - timedelta(days=30)
         if not date_to:
-            date_to = timezone.now().date()
+            date_to = localdate()
 
         user = request.user
         qs = _org_chat_qs(user)
