@@ -58,8 +58,9 @@ if ! docker compose version >/dev/null 2>&1; then
 fi
 
 # ---------- 3. Фронт-репо ---------------------------------------------
-if [[ ! -d "$FRONTEND_DIR" ]]; then
+if [[ ! -d "$FRONTEND_DIR/.git" ]]; then
     say "Клонирую фронт из $FRONTEND_REPO"
+    rm -rf "$FRONTEND_DIR"
     git clone --depth 1 "$FRONTEND_REPO" "$FRONTEND_DIR"
 else
     say "Фронт уже клонирован, обновляю"
